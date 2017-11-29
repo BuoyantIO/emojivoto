@@ -3,8 +3,8 @@ package api
 import (
 	"testing"
 	"context"
-	pb "github.com/buoyantio/boron/demos/emojivoto/emojivoto-voting-svc/gen/proto"
-	"github.com/buoyantio/boron/demos/emojivoto/emojivoto-voting-svc/voting"
+	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
+	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 )
 
 func TestVote(t *testing.T) {

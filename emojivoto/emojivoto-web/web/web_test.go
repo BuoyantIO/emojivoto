@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"context"
 	"google.golang.org/grpc"
-	pb "github.com/buoyantio/boron/demos/emojivoto/emojivoto-web/gen/proto"
+	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-web/gen/proto"
 	"net/url"
 )
 

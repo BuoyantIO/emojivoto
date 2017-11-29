@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net"
 	"google.golang.org/grpc"
-	"github.com/buoyantio/boron/demos/emojivoto/emojivoto-emoji-svc/api"
-	"github.com/buoyantio/boron/demos/emojivoto/emojivoto-emoji-svc/emoji"
+	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/api"
+	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"io/ioutil"
-	pb "github.com/buoyantio/boron/demos/emojivoto/emojivoto-web/gen/proto"
+	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-web/gen/proto"
 	"context"
 	"errors"
 	"strconv"
