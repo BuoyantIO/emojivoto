@@ -25,9 +25,8 @@ deploy-to-minikube:
 	$(MAKE) -C emojivoto-web build-container
 	$(MAKE) -C emojivoto-emoji-svc build-container
 	$(MAKE) -C emojivoto-voting-svc build-container
-	kubectl create ns  emojivoto || echo "ok"
 	kubectl delete -f emojivoto.yml || echo "ok"
-	kubectl create -f emojivoto.yml
+	kubectl apply -f emojivoto.yml
 
 
 deploy-to-docker-compose:
