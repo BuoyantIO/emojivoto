@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package emojivoto.v1;
+
+message VotingResult {
+    string Shortcode = 1;
+    int32 Votes = 2;
+}
+
+message VoteRequest {
+    string Shortcode = 1;
+}
+
+message VoteResponse {
+}
+
+message ResultsRequest {
+}
+
+message ResultsResponse {
+    repeated VotingResult results = 1;
+}
+
+service VotingService {
+    rpc Vote (VoteRequest) returns (VoteResponse);
+    rpc Results (ResultsRequest) returns (ResultsResponse);
+}

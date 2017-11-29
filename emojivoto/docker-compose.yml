@@ -1,0 +1,31 @@
+version: '3'
+services:
+  web:
+    image: buoyantio/emojivoto-web:v1
+    environment:
+      - WEB_PORT=8080
+      - EMOJISVC_HOST=emoji-svc:8080
+      - VOTINGSVC_HOST=voting-svc:8080
+    ports:
+      - "8080:8080"
+    links:
+      - voting-svc
+      - emoji-svc
+  api:
+    image: buoyantio/emojivoto-api:v1
+    environment:
+      - API_PORT=9090
+      - EMOJISVC_HOST=emoji-svc:8080
+    ports:
+      - "9090:9090"
+    links:
+      - voting-svc
+      - emoji-svc
+  emoji-svc:
+    image: buoyantio/emojivoto-emoji-svc:v1
+    environment:
+      - GRPC_PORT=8080
+  voting-svc:
+    image: buoyantio/emojivoto-voting-svc:v1
+    environment:
+      - GRPC_PORT=8080
