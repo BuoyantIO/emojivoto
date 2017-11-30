@@ -6,9 +6,9 @@ A demo app for the Conduit service mesh
 
 0. Pull images and install CLI (pre-release)
 
-In the boron repo:
-
 ```
+# In the boron repo:
+
 gcloud docker --authorize-only
 bin/mkube bin/docker-pull latest
 go install ./conduit

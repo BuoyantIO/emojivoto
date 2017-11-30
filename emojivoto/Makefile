@@ -30,7 +30,8 @@ deploy-to-minikube:
 
 
 deploy-to-docker-compose:
-	docker-compose rm -f
+	docker-compose stop
+	docker-compose rm -vf
 	$(MAKE) -C emojivoto-api build-container
 	$(MAKE) -C emojivoto-web build-container
 	$(MAKE) -C emojivoto-emoji-svc build-container
@@ -39,4 +40,5 @@ deploy-to-docker-compose:
 
 integration-tests: deploy-to-docker-compose
 	WEB_URL=http://localhost:8080 API_URL=http://localhost:9090 $(MAKE) -C integration_test test
-	docker-compose rm -f
+	docker-compose stop
+	docker-compose rm -vf

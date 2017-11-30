@@ -1,6 +1,6 @@
 svc_name := emojivoto-api
 
-all: clean protoc test package
+all: clean protoc dep test package
 
 include ../common.mk
 
