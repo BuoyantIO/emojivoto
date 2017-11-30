@@ -8,12 +8,15 @@ clean:
 	mkdir -p $(target_dir)
 	mkdir -p gen
 
+dep:
+	dep ensure
+
 protoc:
 	protoc -I .. ../proto/*.proto --go_out=plugins=grpc:gen
 
-package: protoc compile build-container
+package: protoc dep compile build-container
 
-build-container: 
+build-container:
 	docker build .. -t "buoyantio/$(svc_name):v1" --build-arg svc_name=$(svc_name)
 
 compile:

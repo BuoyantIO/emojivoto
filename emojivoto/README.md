@@ -2,27 +2,35 @@
 
 A demo app for the Conduit service mesh
 
-## Demo Instructions (pre-release)
+## Demo Instructions (Minikube)
 
-1. Pull and install Conduit
+0. Pull images and install CLI (pre-release)
+
+In the boron repo:
 
 ```
 gcloud docker --authorize-only
 bin/mkube bin/docker-pull latest
-bin/go-run ./conduit/main.go install | kubectl apply -f -
+go install ./conduit
+```
+
+1. Install Conduit
+
+```
+conduit install | kubectl apply -f -
 ```
 
 2. Build Votemoji images
 
 ```
-cd demos/emojivoto
-bin/mkube make build-base-docker-image build
+eval $(minikube docker-env)
+make build-base-docker-image build
 ```
 
 3. Inject, Deploy, and Enjoy
 
 ```
-bin/go-run ./conduit/main.go inject demos/emojivoto/emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
+conduit inject emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
 ```
 
 4. Use the app!
@@ -34,5 +42,15 @@ minikube -n emojivoto service web-svc
 5. View the dashboard!
 
 ```
-bin/go-run ./conduit/main.go dashboard
+conduit dashboard
 ```
+
+## Docker Instructions
+
+To run the app locally with docker-compose:
+
+```
+make deploy-to-docker-compose
+```
+
+The web app will be running on port 8080 of your docker host.
