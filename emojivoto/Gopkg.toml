@@ -1,0 +1,9 @@
+required = ["github.com/golang/protobuf/protoc-gen-go"]
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "1.7.0"
+
+[[constraint]]
+  name = "github.com/golang/protobuf"
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845" # protobuf has no release tags at time of writing
