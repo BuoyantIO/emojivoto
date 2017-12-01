@@ -13,10 +13,10 @@ func TestListAllEmoji(t *testing.T) {
 			allEmojiSet[emoji.Unicode] = true
 		}
 
-		for _, unicode := range emojiCodeMap {
-			if !allEmojiSet[unicode] {
+		for _, alias := range top100Emoji {
+			if !allEmojiSet[emojiCodeMap[alias]] {
 
-				t.Fatalf("All Emoji doesnt contain [%s]", unicode)
+				t.Fatalf("All Emoji doesnt contain [%s]", emojiCodeMap[alias])
 			}
 		}
 	})
