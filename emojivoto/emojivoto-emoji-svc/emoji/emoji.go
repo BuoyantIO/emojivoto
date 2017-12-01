@@ -17,6 +17,7 @@ type inMemoryAllEmoji struct {
 }
 
 var top100Emoji = []string{
+	":poop:",
 	":joy:",
 	":sunglasses:",
 	":relaxed:",
@@ -26,7 +27,6 @@ var top100Emoji = []string{
 	":mask:",
 	":nerd_face:",
 	":ghost:",
-	":poop:",
 	":skull_and_crossbones:",
 	":heart_eyes_cat:",
 	":hear_no_evil:",
