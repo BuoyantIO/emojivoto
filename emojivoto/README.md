@@ -45,7 +45,7 @@ minikube -n emojivoto service web-svc
 conduit dashboard
 ```
 
-## Docker Instructions
+### Docker Instructions
 
 To run the app locally with docker-compose:
 
@@ -54,3 +54,17 @@ make deploy-to-docker-compose
 ```
 
 The web app will be running on port 8080 of your docker host.
+
+### Local Development Instructions
+
+To update the Docker images with local changes:
+
+```
+make build
+```
+
+To update just webapp dependencies (JS, CSS, assets):
+
+```
+make web
+```
