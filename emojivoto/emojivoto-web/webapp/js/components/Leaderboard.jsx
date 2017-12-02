@@ -39,7 +39,7 @@ export default class Leaderboard extends React.Component {
       return (
         <div className="emoji" key={`emoji-${i}`} title={`${emoji.votes} votes`}>
           <div>{emoji.unicode}</div>
-          { emoji.votes > 0 ? <div>{emoji.votes}</div> : null}
+          { emoji.votes > 0 ? <div className="counter">{emoji.votes}</div> : null}
         </div>
       );
     });
@@ -50,9 +50,13 @@ export default class Leaderboard extends React.Component {
       <div className="background">
         <div className="page-content">
             {!this.state.error ? null : <div className="error">Error loading leaderboard.</div>}
-            <h1>VOTEMOJI LEADERBOARD </h1>
+            <h1>>EMOJI VOTE LEADERBOARD </h1>
             <div className="btn btn-blue"><Link to="/">Vote on your favorite</Link></div>
             <div className="emoji-list">{this.renderLeaderboard()}</div>
+            <div className="conduit-footer">
+              <p className="footer-cta">Tap here to learn more about Conduit</p>
+              <p className="footer-cta-web">Click here to learn more about Conduit</p>
+            </div>
         </div>
       </div>
     );
