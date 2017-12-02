@@ -30,16 +30,15 @@ export default class Vote extends React.Component {
   }
 
   vote(emoji) {
-    fetch(`/api/vote?choice=${emoji.shortcode}`)
-      .then(rsp => {
+    fetch(`/api/vote?choice=${emoji.shortcode}`).then(rsp => {
         if (rsp.ok) {
           this.setState({ selectedEmoji: emoji, error: null });
         } else {
-            throw new Error("Unable to Register Vote");
+          throw new Error("Unable to Register Vote");
         }}).catch(e => {
-        console.error(e);
-        this.setState({ error: e.toString() })
-      });
+          console.error(e);
+          this.setState({ error: e.toString() });
+        });
     this.setState({ selectedEmoji: emoji }); // TODO: remove
   }
 
@@ -78,13 +77,11 @@ export default class Vote extends React.Component {
       return (
         <div className="background">
           <div className="page-content" data-aos="fade-left">
-            {!this.state.error ? null :
-              <div className="error">Could not vote. Error: {this.state.error}</div>}
             <h1 className="headline">🗳</h1>
             <h1>EMOJI VOTE</h1>
             <p>Tap to vote for your favorite emoji below</p>
             <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
-            {!_.isEmpty(this.state.emojiList) ? null : <div>Loading emoji...</div>}
+            {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
             <div className="emoji-list">{this.renderEmojiList(emojiList)}</div>
           </div>
         </div>

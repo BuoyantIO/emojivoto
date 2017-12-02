@@ -3,12 +3,14 @@ import _ from 'lodash';
 import 'whatwg-fetch';
 import { Link } from 'react-router-dom';
 
-const randomLeaderboard = () => _.map(Emoji, emo => {
-  return {
-    unicode: emo.unicode,
-    votes: Math.round(Math.random() * 1000)
-  }
-});
+
+// TODO: Remove? (not currently)
+// const randomLeaderboard = () => _.map(emo => {
+//   return {
+//     unicode: emo.unicode,
+//     votes: Math.round(Math.random() * 1000)
+//   }
+// });
 export default class Leaderboard extends React.Component {
   constructor(props) {
     super(props);
@@ -30,8 +32,9 @@ export default class Leaderboard extends React.Component {
       }).catch(e => this.setState({ error: e }));
     }).catch(e => this.setState({ error: e }));
 
-    let leaderboard = randomLeaderboard();
-    this.setState({ leaderboard: _.orderBy(leaderboard, 'votes', 'desc') });
+    // TODO: Remove? (not currently)
+    // let leaderboard = randomLeaderboard();
+    // this.setState({ leaderboard: _.orderBy(leaderboard, 'votes', 'desc') });
   }
 
   renderLeaderboard() {
@@ -50,7 +53,7 @@ export default class Leaderboard extends React.Component {
       <div className="background">
         <div className="page-content">
             {!this.state.error ? null : <div className="error">Error loading leaderboard.</div>}
-            <h1>>EMOJI VOTE LEADERBOARD </h1>
+            <h1>EMOJI VOTE LEADERBOARD </h1>
             <div className="btn btn-blue"><Link to="/">Vote on your favorite</Link></div>
             <div className="emoji-list">{this.renderLeaderboard()}</div>
             <div className="conduit-footer">
