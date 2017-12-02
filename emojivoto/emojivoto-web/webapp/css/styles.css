@@ -39,33 +39,44 @@ h2, h3, h4, h5, h6 {
   min-height: 100vh;
   background: linear-gradient(124deg, #9B51E0 0%, #FF009B 23.76%, #F2C94C 47.51%, #2F80ED 78.45%, #219653 100%);
   background-size: 500% 500%;
-
   -webkit-animation: rainbow 12s ease infinite;
   -z-animation: rainbow 12s ease infinite;
   -o-animation: rainbow 12s ease infinite;
-    animation: rainbow 12s ease infinite;}
-
-  @-webkit-keyframes rainbow {
-      0%{background-position:0% 82%}
-      50%{background-position:100% 19%}
-      100%{background-position:0% 82%}
-  }
-  @-moz-keyframes rainbow {
-      0%{background-position:0% 82%}
-      50%{background-position:100% 19%}
-      100%{background-position:0% 82%}
-  }
-  @-o-keyframes rainbow {
-      0%{background-position:0% 82%}
-      50%{background-position:100% 19%}
-      100%{background-position:0% 82%}
-  }
-  @keyframes rainbow { 
-      0%{background-position:0% 82%}
-      50%{background-position:100% 19%}
-      100%{background-position:0% 82%}
+  animation: rainbow 12s ease infinite;
 }
 
+.background-500 {
+  padding-top: 2vw;
+  height: 100%;
+  min-height: 100vh;
+  background: -webkit-repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);
+  background: repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);
+}
+
+@-webkit-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@-moz-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@-o-keyframes rainbow {
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+@keyframes rainbow { 
+  0%{background-position:0% 82%}
+  50%{background-position:100% 19%}
+  100%{background-position:0% 82%}
+}
+
+h1 .title {
+  font-size: 3rem;
+}
 
 .page-content {
   border-radius: 1vw;
@@ -103,7 +114,6 @@ h2, h3, h4, h5, h6 {
 
 .emoji:active {
   background-color: rgba(47, 128, 237,1);
-
 }
 
 .error {
@@ -136,4 +146,70 @@ h2, h3, h4, h5, h6 {
 .btn.btn-white {
   border: 1px solid var(--buttonblue);
   color: var(--buttonblue);
+}
+
+.conduit-footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  min-height: 30px;
+  height: 8vh;
+  width: 100%;
+  background-color: #ff576b;
+  color: white;
+  text-align: center;
+}
+
+.conduit-footer-logo {
+  width: 80px;
+}
+
+.counter {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.servicemesh {
+  padding: 10px;
+  width: 20vw;
+}
+
+.conduit-mark {
+  animation: offset 30s linear forwards;
+  stroke-dasharray: 841px;
+  stroke-dashoffset: 841px;
+  animation-delay: 0s;
+  /*animation-iteration-count: infinite;*/
+}
+
+@media screen and (min-width: 638px) { 
+  .footer-cta-web {
+    font-weight: bold;
+  }
+
+  .footer-cta {
+    display: none;
+  }  
+
+  .emoji {
+    border-radius: 50%;
+    margin: 30px 4px 30px 4px;
+    font-size: 3rem;
+    float: left;
+    height: 85px;
+    width: 85px;
+    padding: 5px;
+    cursor: pointer;
+    line-height: 5.4rem;
+  }
+}
+
+@media screen and (max-width: 638px) { 
+  .footer-cta {
+    font-weight: bold;
+  }  
+
+  .footer-cta-web {
+    display: none;
+  }
 }
