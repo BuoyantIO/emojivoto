@@ -71,7 +71,7 @@ export default class Vote extends React.Component {
             {!this.state.error ? null :
               <div className="error">Could not vote. Error: {this.state.error}</div>}
             <h1 className="headline">🗳</h1>
-            <h1>VOTEMOJI</h1>
+            <h1>EMOJI VOTE</h1>
             <p>Tap to vote for your favorite emoji below</p>
             <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
             {!_.isEmpty(this.state.emojiList) ? null : <div>Loading emoji...</div>}
@@ -81,13 +81,12 @@ export default class Vote extends React.Component {
       );
     } else {
       return (
-        <div className="background">
+        <div className="background-500">
           <div className="page-content">
-            <h1>You picked:</h1>
-            <h1 className="headline">{this.state.selectedEmoji.unicode}</h1>
-            <p>See how you stack up against others</p>
-            <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
-            <div className="btn btn-white"><Link to="/" onClick={this.resetState}>Pick another one</Link></div>
+            <h1 className="title">Uh oh.</h1>
+            <h1 className="headline">🚧</h1>
+            <p>We couldn't process your request.</p>
+            <div className="btn btn-blue"><Link to="/" onClick={this.resetState}>Select again</Link></div>
           </div>
         </div>
       );
