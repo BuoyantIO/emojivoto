@@ -1,15 +1,16 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-web/gen/proto"
-	"context"
-	"errors"
 	"strconv"
+
+	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-web/gen/proto"
 )
 
 type WebApp struct {
@@ -161,7 +162,7 @@ func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votin
 	http.HandleFunc("/api/leaderboard", webApp.leaderboardHandler)
 
 	// TODO: make static assets dir configurable
-	http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir("votemoji/dist"))))
+	http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", webPort), nil)
 	if err != nil {
