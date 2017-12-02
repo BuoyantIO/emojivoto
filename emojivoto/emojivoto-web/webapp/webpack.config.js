@@ -3,7 +3,8 @@ const path = require('path');
 module.exports = {
   entry: './js/index.js',
   output: {
-    path: path.resolve('dist'),
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: 'dist/',
     filename: 'index_bundle.js'
   },
   // devtool: 'inline-cheap-source-map', // uncomment for nicer logging, makes dev slower
@@ -24,6 +25,15 @@ module.exports = {
           'style-loader',
           { loader: 'css-loader', options: { importLoaders: 1 } },
           'postcss-loader'
+        ]
+      },
+      {
+        test: /\.(png|jpg|gif|eot|svg|ttf|woff|woff2)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: { publicPath: 'dist/' }
+          }
         ]
       }
     ]
