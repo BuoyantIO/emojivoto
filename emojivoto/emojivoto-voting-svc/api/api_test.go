@@ -1,8 +1,9 @@
 package api
 
 import (
-	"testing"
 	"context"
+	"testing"
+
 	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
 	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 )
@@ -41,7 +42,7 @@ func TestLeaderboard(t *testing.T) {
 		}
 
 		votedForTwice := ":wave:"
-		votedForOnce := ":poop:"
+		votedForOnce := ":ghost:"
 
 		emojivotoService.Vote(ctx, &pb.VoteRequest{Shortcode: votedForTwice})
 		emojivotoService.Vote(ctx, &pb.VoteRequest{Shortcode: votedForTwice})
@@ -57,7 +58,7 @@ func TestLeaderboard(t *testing.T) {
 			t.Fatalf("Expected results to contain two emoji, found: [%v]", response.Results)
 		}
 
-		if response.Results[0].Shortcode != votedForTwice|| response.Results[0].Votes != 2 {
+		if response.Results[0].Shortcode != votedForTwice || response.Results[0].Votes != 2 {
 			t.Fatalf("Expected results to be [%s,%s], found: [%v]", votedForTwice, 2, response.Results)
 		}
 

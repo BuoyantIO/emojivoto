@@ -1,7 +1,6 @@
 package web
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,7 +18,7 @@ type WebApp struct {
 }
 
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
-	serviceResponse, err := app.emojiServiceClient.ListAll(context.Background(), &pb.ListAllEmojiRequest{})
+	serviceResponse, err := app.emojiServiceClient.ListAll(r.Context(), &pb.ListAllEmojiRequest{})
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
 		return
@@ -41,7 +40,7 @@ func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
-	results, err := app.votingServiceClient.Results(context.Background(), &pb.ResultsRequest{})
+	results, err := app.votingServiceClient.Results(r.Context(), &pb.ResultsRequest{})
 
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
@@ -54,7 +53,7 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 			Shortcode: result.Shortcode,
 		}
 
-		findByShortcodeResponse, err := app.emojiServiceClient.FindByShortcode(context.Background(), findByShortcodeRequest)
+		findByShortcodeResponse, err := app.emojiServiceClient.FindByShortcode(r.Context(), findByShortcodeRequest)
 
 		if err != nil {
 			writeError(err, w, r, http.StatusInternalServerError)
@@ -79,31 +78,35 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	emojiShortcode := r.FormValue("choice")
-
 	if emojiShortcode == "" {
 		error := errors.New(fmt.Sprintf("Emoji choice [%s] is mandatory", emojiShortcode))
 		writeError(error, w, r, http.StatusBadRequest)
 		return
 	}
+
 	request := &pb.FindByShortcodeRequest{
 		Shortcode: emojiShortcode,
 	}
-	response, err := app.emojiServiceClient.FindByShortcode(context.Background(), request)
-
+	response, err := app.emojiServiceClient.FindByShortcode(r.Context(), request)
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
 		return
 	}
+
 	chosenEmoji := response.Emoji
 	if chosenEmoji == nil {
-		error := errors.New(fmt.Sprintf("Choosen emoji shortcode [%s] doesnt exist", emojiShortcode))
-		writeError(error, w, r, http.StatusBadRequest)
-	} else {
-		request := &pb.VoteRequest{
-			Shortcode: chosenEmoji.Shortcode,
-		}
+		err = errors.New(fmt.Sprintf("Choosen emoji shortcode [%s] doesnt exist", emojiShortcode))
+		writeError(err, w, r, http.StatusBadRequest)
+		return
+	}
 
-		app.votingServiceClient.Vote(context.Background(), request)
+	voteRequest := &pb.VoteRequest{
+		Shortcode: chosenEmoji.Shortcode,
+	}
+	_, err = app.votingServiceClient.Vote(r.Context(), voteRequest)
+	if err != nil {
+		writeError(err, w, r, http.StatusInternalServerError)
+		return
 	}
 }
 
