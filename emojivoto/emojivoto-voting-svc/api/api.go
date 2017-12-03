@@ -2,9 +2,11 @@ package api
 
 import (
 	"context"
-	"google.golang.org/grpc"
+	"fmt"
+
 	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
 	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
+	"google.golang.org/grpc"
 )
 
 type PollServiceServer struct {
@@ -12,21 +14,25 @@ type PollServiceServer struct {
 }
 
 func (pS *PollServiceServer) Vote(context context.Context, req *pb.VoteRequest) (*pb.VoteResponse, error) {
-	err := pS.poll.Vote(req.Shortcode)
-	return nil, err
+	sc := req.Shortcode
+	if sc == ":shit:" || sc == ":poop:" || sc == ":hankey:" {
+		return nil, fmt.Errorf("ERROR")
+	}
+	err := pS.poll.Vote(sc)
+	return &pb.VoteResponse{}, err
 }
 
 func (pS *PollServiceServer) Results(context.Context, *pb.ResultsRequest) (*pb.ResultsResponse, error) {
 	results, e := pS.poll.Results()
 	if e != nil {
-		return &pb.ResultsResponse{}, e
+		return nil, e
 	}
 
 	votingResults := make([]*pb.VotingResult, 0)
 	for _, e := range results {
 		result := pb.VotingResult{
 			Shortcode: e.Shortcode,
-			Votes: int32(e.NumVotes),
+			Votes:     int32(e.NumVotes),
 		}
 		votingResults = append(votingResults, &result)
 	}
