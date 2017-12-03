@@ -76,13 +76,18 @@ export default class Vote extends React.Component {
       let emojiList = this.state.emojiList;
       return (
         <div className="background">
-          <div className="page-content" data-aos="fade-left">
+          <div className="page-content">
             <h1 className="headline">🗳</h1>
             <h1>EMOJI VOTE</h1>
             <p>Tap to vote for your favorite emoji below</p>
             <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
             {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
-            <div className="emoji-list">{this.renderEmojiList(emojiList)}</div>
+            <div className="emoji-list">{this.renderEmojiList(emojiList)}
+              <div className="footer-text">
+                <p>A <a href='https://buoyant.io'>Buoyant</a> social experiment</p>
+                <p>© 2017 Buoyant, Inc. All Rights Reserved.</p>
+              </div>
+            </div>
           </div>
         </div>
       );
