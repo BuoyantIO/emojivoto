@@ -150,6 +150,8 @@ spec:
           value: "emoji-svc.emojivoto:8080"
         - name: VOTINGSVC_HOST
           value: "voting-svc.emojivoto:8080"
+        - name: INDEX_BUNDLE
+          value: "dist/index_bundle.js"
         ports:
         - name: http
           containerPort: 80
