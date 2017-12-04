@@ -41172,10 +41172,11 @@ var Vote = function (_React$Component) {
         if (rsp.ok) {
           _this3.setState({ selectedEmoji: emoji, error: null });
         } else {
-          _this3.setState({ error: rsp.statusText });
+          throw new Error("Unable to Register Vote");
         }
       }).catch(function (e) {
-        _this3.setState({ error: e.statusText });
+        console.error(e);
+        _this3.setState({ error: e.toString() });
       });
       this.setState({ selectedEmoji: emoji }); // TODO: remove
     }
@@ -41206,20 +41207,47 @@ var Vote = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      if (!this.state.selectedEmoji) {
+      if (this.state.error) {
+        return _react2.default.createElement(
+          'div',
+          { className: 'background-500' },
+          _react2.default.createElement(
+            'div',
+            { className: 'page-content' },
+            _react2.default.createElement(
+              'h1',
+              { className: 'title' },
+              'Uh oh.'
+            ),
+            _react2.default.createElement(
+              'h1',
+              { className: 'headline' },
+              '\uD83D\uDEA7'
+            ),
+            _react2.default.createElement(
+              'p',
+              null,
+              'We couldn\'t process your request.'
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'btn btn-blue' },
+              _react2.default.createElement(
+                _reactRouterDom.Link,
+                { to: '/', onClick: this.resetState },
+                'Select again'
+              )
+            )
+          )
+        );
+      } else if (!this.state.selectedEmoji) {
         var emojiList = this.state.emojiList;
         return _react2.default.createElement(
           'div',
           { className: 'background' },
           _react2.default.createElement(
             'div',
-            { className: 'page-content', 'data-aos': 'fade-left' },
-            !this.state.error ? null : _react2.default.createElement(
-              'div',
-              { className: 'error' },
-              'Could not vote. Error: ',
-              this.state.error
-            ),
+            { className: 'page-content' },
             _react2.default.createElement(
               'h1',
               { className: 'headline' },
@@ -41228,7 +41256,7 @@ var Vote = function (_React$Component) {
             _react2.default.createElement(
               'h1',
               null,
-              'VOTEMOJI'
+              'EMOJI VOTE'
             ),
             _react2.default.createElement(
               'p',
@@ -41244,7 +41272,7 @@ var Vote = function (_React$Component) {
                 'View the leaderboard'
               )
             ),
-            !_lodash2.default.isEmpty(this.state.emojiList) ? null : _react2.default.createElement(
+            !_lodash2.default.isEmpty(emojiList) ? null : _react2.default.createElement(
               'div',
               null,
               'Loading emoji...'
@@ -41252,7 +41280,27 @@ var Vote = function (_React$Component) {
             _react2.default.createElement(
               'div',
               { className: 'emoji-list' },
-              this.renderEmojiList(emojiList)
+              this.renderEmojiList(emojiList),
+              _react2.default.createElement(
+                'div',
+                { className: 'footer-text' },
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  'A ',
+                  _react2.default.createElement(
+                    'a',
+                    { href: 'https://buoyant.io' },
+                    'Buoyant'
+                  ),
+                  ' social experiment'
+                ),
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  '\xA9 2017 Buoyant, Inc. All Rights Reserved.'
+                )
+              )
             )
           )
         );
@@ -44491,15 +44539,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var randomLeaderboard = function randomLeaderboard() {
-  return _lodash2.default.map(Emoji, function (emo) {
-    return {
-      unicode: emo.unicode,
-      votes: Math.round(Math.random() * 1000)
-    };
-  });
-};
-
+// TODO: Remove? (not currently)
+// const randomLeaderboard = () => _.map(emo => {
+//   return {
+//     unicode: emo.unicode,
+//     votes: Math.round(Math.random() * 1000)
+//   }
+// });
 var Leaderboard = function (_React$Component) {
   _inherits(Leaderboard, _React$Component);
 
@@ -44536,8 +44582,9 @@ var Leaderboard = function (_React$Component) {
         return _this2.setState({ error: e });
       });
 
-      var leaderboard = randomLeaderboard();
-      this.setState({ leaderboard: _lodash2.default.orderBy(leaderboard, 'votes', 'desc') });
+      // TODO: Remove? (not currently)
+      // let leaderboard = randomLeaderboard();
+      // this.setState({ leaderboard: _.orderBy(leaderboard, 'votes', 'desc') });
     }
   }, {
     key: 'renderLeaderboard',
@@ -44553,7 +44600,7 @@ var Leaderboard = function (_React$Component) {
           ),
           emoji.votes > 0 ? _react2.default.createElement(
             'div',
-            null,
+            { className: 'counter' },
             emoji.votes
           ) : null
         );
@@ -44576,7 +44623,7 @@ var Leaderboard = function (_React$Component) {
           _react2.default.createElement(
             'h1',
             null,
-            'VOTEMOJI LEADERBOARD '
+            'EMOJI VOTE LEADERBOARD '
           ),
           _react2.default.createElement(
             'div',
@@ -44590,7 +44637,58 @@ var Leaderboard = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'emoji-list' },
-            this.renderLeaderboard()
+            this.renderLeaderboard(),
+            _react2.default.createElement(
+              'div',
+              { className: 'footer-text' },
+              _react2.default.createElement(
+                'p',
+                { className: 'footer-experiment' },
+                'A ',
+                _react2.default.createElement(
+                  'a',
+                  { href: 'https://buoyant.io' },
+                  'Buoyant'
+                ),
+                ' social experiment'
+              ),
+              _react2.default.createElement(
+                'p',
+                null,
+                '\xA9 2017 Buoyant, Inc. All Rights Reserved.'
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'conduit-footer' },
+          _react2.default.createElement(
+            'a',
+            { href: 'https://conduit.io' },
+            _react2.default.createElement(
+              'div',
+              { className: 'footer-mark' },
+              _react2.default.createElement(
+                'svg',
+                { xmlns: 'http://www.w3.org/2000/svg' },
+                _react2.default.createElement('path', { fill: '#ffffff', d: 'M26.23,25.27a1.13,1.13,0,0,0-.73.26,13.62,13.62,0,1,1,0-19.25h0a1.14,1.14,0,0,1-.07,1.51,1.15,1.15,0,0,1-1.63,0h0a11.34,11.34,0,1,0,.08,16.13,3.39,3.39,0,0,0,0-4.81,3.42,3.42,0,0,0-4.84,0,4.51,4.51,0,1,1,0-6.43h0a1.21,1.21,0,0,0,.72.26A1.14,1.14,0,0,0,21,11.78a1.17,1.17,0,0,0-.23-.72h0a6.83,6.83,0,1,0,0,9.66,1.12,1.12,0,0,1,1.6,0,1.15,1.15,0,0,1,0,1.62h0A9.07,9.07,0,1,1,22.21,9.4h0a3.41,3.41,0,0,0,4.91-4.72h0l-.06-.05,0,0h0a15.9,15.9,0,1,0,.08,22.52,1.07,1.07,0,0,0,.24-.71A1.12,1.12,0,0,0,26.23,25.27Z' })
+              )
+            ),
+            _react2.default.createElement(
+              'div',
+              null,
+              _react2.default.createElement(
+                'p',
+                { className: 'footer-cta' },
+                'Tap here to learn more about Conduit'
+              ),
+              _react2.default.createElement(
+                'p',
+                { className: 'footer-cta-web' },
+                'Click here to learn more about Conduit'
+              )
+            )
           )
         )
       );
@@ -44639,10 +44737,10 @@ if(false) {
 
 exports = module.exports = __webpack_require__(239)(undefined);
 // imports
-
+exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Lato:400,400i,700,900);", ""]);
 
 // module
-exports.push([module.i, "\n:root {\n  /* --font-stack: serif, sans-serif; */\n}\n\nbody {\n  margin: 0;\n  font-weight: 400;\n  font-family: 'Lato', helvetica, arial, sans-serif;\n  text-rendering: optimizeLegibility;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\nh1 {\n  font-size: 24px;\n  font-weight: 900;\n  letter-spacing: 2px;\n}\n\nh2, h3, h4, h5, h6 {\n  font-weight: 700;\n}\n\n.headline {\n  font-size: 6rem;\n  line-height: 0;\n}\n\n.background {\n  padding-top: 2vw;\n  height: 100%;\n  min-height: 100vh;\n  background: linear-gradient(124deg, #9B51E0 0%, #FF009B 23.76%, #F2C94C 47.51%, #2F80ED 78.45%, #219653 100%);\n  background-size: 500% 500%;\n\n  -webkit-animation: rainbow 12s ease infinite;\n  -z-animation: rainbow 12s ease infinite;\n    animation: rainbow 12s ease infinite;}\n\n@-webkit-keyframes rainbow {\n      0%{background-position:0% 82%}\n      50%{background-position:100% 19%}\n      100%{background-position:0% 82%}\n  }\n\n@keyframes rainbow { \n      0%{background-position:0% 82%}\n      50%{background-position:100% 19%}\n      100%{background-position:0% 82%}\n}\n\n.page-content {\n  border-radius: 1vw;\n  background-color: #fff;\n  height: 100%;\n  min-height: 96vh;\n  padding: 5vw 0 0 0;\n  width: 96vw;\n  max-width: 632px;\n  margin: 0 auto;\n  text-align: center;\n  overflow: auto;\n}\n\n.emoji-list {\n  margin-top: 50px;\n}\n\n.emoji {\n  border-radius: 50%;\n  margin: 4px;\n  font-size: 2rem;\n  float: left;\n  height: 50px;\n  width: 50px;\n  padding: 5px;\n  cursor: pointer;\n  line-height: 3.2rem;\n}\n\n.emoji:hover {\n  -webkit-transition: 0.2s ease;\n  transition: 0.2s ease;\n  background-color: rgba(47, 128, 237, .2);\n}\n\n.emoji:active {\n  background-color: rgba(47, 128, 237, 1);\n\n}\n\n.error {\n  color: #EB5757;\n  padding: 5px;\n}\n\n.btn {\n  border-radius: 100px;\n  padding: 10px 8px 11px 8px;\n  width: 50%;\n  margin: 30px auto;\n}\n\n.btn a {\n  color: inherit;\n  text-decoration: none;\n  font-weight: 700;\n}\n\n.btn a:visited {\n  text-decoration: none;\n}\n\n.btn.btn-blue {\n  background: #2F80ED;;\n  color: white;\n}\n\n.btn.btn-white {\n  border: 1px solid #2F80ED;\n  color: #2F80ED;\n}", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  font-weight: 400;\n  font-family: 'Lato', 'Helvetica Neue', Helvetica, arial, sans-serif;\n  text-rendering: optimizeLegibility;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\nh1 {\n  font-size: 24px;\n  font-weight: 900;\n  letter-spacing: 2px;\n}\n\nh2, h3, h4, h5, h6 {\n  font-weight: 700;\n}\n\na {\n  text-decoration: none;\n}\n\n.headline {\n  font-size: 6rem;\n  line-height: 0;\n}\n\n.footer-text {\n  left: 0;\n  color: #999;\n  font-size: .8em;\n  margin: 0px 50% 0 50%;\n  width: 70vw;\n  display: inline;\n}\n\n.conduit-footer {\n  position: fixed;\n  left: 0;\n  bottom: 0;\n  min-height: 70px;\n  height: 8vh;\n  width: 100%;\n  background-color: #ff576b;\n  color: white;\n  text-align: center;\n  border-top: 2px solid #fff;\n  animation: fadein 2s;\n  -moz-animation: fadein 2s; /* Firefox */\n  -webkit-animation: fadein 2s; /* Safari and Chrome */\n  -o-animation: fadein 2s; /* Opera */\n}\n\n@keyframes fadein {\n    from {\n        opacity:0;\n    }\n    to {\n        opacity:1;\n    }\n}\n\n@-webkit-keyframes fadein { /* Safari and Chrome */\n    from {\n        opacity:0;\n    }\n    to {\n        opacity:1;\n    }\n}\n\n.footer-mark {\n  height: 50%;\n  float: left;\n  padding: 1vh 50% 0 50%;\n}\n\n.footer-experiment {\n  margin: 25% 0 0 0;\n}\n\nsvg path {\n}\n\n.background {\n  padding-top: 2vw;\n  height: 100%;\n  min-height: 100vh;\n  background: linear-gradient(124deg, #9B51E0 0%, #FF009B 23.76%, #F2C94C 47.51%, #2F80ED 78.45%, #219653 100%);\n  background-size: 500% 500%;\n  -webkit-animation: rainbow 12s ease infinite;\n  -z-animation: rainbow 12s ease infinite;\n  animation: rainbow 12s ease infinite;\n}\n\n.background-500 {\n  padding-top: 2vw;\n  height: 100%;\n  min-height: 100vh;\n  background-color: yellow;\n  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, black 35px, black 70px);\n/*  background: -webkit-repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);\n  background: repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);*/\n  -webkit-animation: 500s infinite;\n  -z-animation: rainbow 500s infinite;\n  animation: rainbow 500s infinite;\n}\n\n@-webkit-keyframes rainbow {\n  0%{background-position:0% 82%}\n  50%{background-position:100% 19%}\n  100%{background-position:0% 82%}\n}\n\n@keyframes rainbow { \n  0%{background-position:0% 82%}\n  50%{background-position:100% 19%}\n  100%{background-position:0% 82%}\n}\n\nh1 .title {\n  font-size: 3rem;\n}\n\n.page-content {\n  border-radius: 1vw;\n  background-color: #fff;\n  height: 100%;\n  min-height: 96vh;\n  padding: 5vw 0 0 0;\n  width: 96vw;\n  max-width: 632px;\n  margin: 0 auto;\n  text-align: center;\n  overflow: auto;\n}\n\n.emoji-list {\n  margin-top: 50px;\n}\n\n.emoji {\n  border-radius: 50%;\n  margin: 4px;\n  font-size: 2rem;\n  float: left;\n  height: 50px;\n  width: 50px;\n  padding: 5px;\n  cursor: pointer;\n  line-height: 3.2rem;\n}\n\n.emoji:hover {\n  -webkit-transition: 0.2s ease;\n  transition: 0.2s ease;\n  background-color: rgba(47, 128, 237, .2);\n}\n\n.emoji:active {\n  background-color: rgba(47, 128, 237, 1);\n}\n\n.error {\n  color: #EB5757;\n  padding: 5px;\n}\n\n.btn {\n  border-radius: 100px;\n  padding: 10px 8px 11px 8px;\n  width: 50%;\n  margin: 30px auto;\n}\n\n.btn a {\n  color: inherit;\n  text-decoration: none;\n  font-weight: 700;\n}\n\n.btn a:visited {\n  text-decoration: none;\n}\n\n.btn.btn-blue {\n  background: #2F80ED;;\n  color: white;\n}\n\n.btn.btn-white {\n  border: 1px solid #2F80ED;\n  color: #2F80ED;\n}\n\n.counter {\n  font-size: 1.5rem;\n  line-height: 1;\n}\n\n@media screen and (min-width: 638px) { \n  .footer-cta-web {\n    font-weight: bold;\n    font-size: .9em;\n    line-height: 1.5em;\n    color: #fff;\n  }\n\n  .footer-cta {\n    display: none;\n  }  \n\n  .emoji {\n    border-radius: 50%;\n    margin: 30px 4px 30px 4px;\n    font-size: 3rem;\n    float: left;\n    height: 85px;\n    width: 85px;\n    padding: 5px;\n    cursor: pointer;\n    line-height: 5.4rem;\n  }\n}\n\n@media screen and (max-width: 638px) { \n  .footer-cta {\n    font-weight: bold;\n    font-size: .9em;\n    line-height: 1.5em;\n    color: #fff;\n  }  \n\n  .footer-cta-web {\n    display: none;\n  }\n}", ""]);
 
 // exports
 

@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,400i,700,900');
 
 :root {
   --buttonblue: #2F80ED;
-  --font-stack: 'Lato', helvetica, arial, sans-serif;
-  /* --font-stack: serif, sans-serif; */
+  --font-stack: 'Lato', 'Helvetica Neue', Helvetica, arial, sans-serif;
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-bold: 700;
@@ -28,10 +28,88 @@ h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-bold);
 }
 
+a {
+  text-decoration: none;
+}
+
 .headline {
   font-size: 6rem;
   line-height: 0;
 }
+
+.footer-text {
+  left: 0;
+  color: #999;
+  font-size: .8em;
+  margin: 0px 50% 0 50%;
+  width: 70vw;
+  display: inline;
+}
+
+.conduit-footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  min-height: 70px;
+  height: 8vh;
+  width: 100%;
+  background-color: #ff576b;
+  color: white;
+  text-align: center;
+  border-top: 2px solid #fff;
+  animation: fadein 2s;
+  -moz-animation: fadein 2s; /* Firefox */
+  -webkit-animation: fadein 2s; /* Safari and Chrome */
+  -o-animation: fadein 2s; /* Opera */
+}
+
+@keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-moz-keyframes fadein { /* Firefox */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-webkit-keyframes fadein { /* Safari and Chrome */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-o-keyframes fadein { /* Opera */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+.footer-mark {
+  height: 50%;
+  float: left;
+  padding: 1vh 50% 0 50%;
+}
+
+.footer-experiment {
+  margin: 25% 0 0 0;
+}
+
+svg path {
+}  
 
 .background {
   padding-top: 2vw;
@@ -49,8 +127,14 @@ h2, h3, h4, h5, h6 {
   padding-top: 2vw;
   height: 100%;
   min-height: 100vh;
-  background: -webkit-repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);
-  background: repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);
+  background-color: yellow;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, black 35px, black 70px);
+/*  background: -webkit-repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);
+  background: repeating-linear-gradient(45deg, yellow, yellow 40px, black 10px, black 80px);*/
+  -webkit-animation: 500s infinite;
+  -z-animation: rainbow 500s infinite;
+  -o-animation: rainbow 500s infinite;
+  animation: rainbow 500s infinite;
 }
 
 @-webkit-keyframes rainbow {
@@ -148,43 +232,18 @@ h1 .title {
   color: var(--buttonblue);
 }
 
-.conduit-footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  min-height: 30px;
-  height: 8vh;
-  width: 100%;
-  background-color: #ff576b;
-  color: white;
-  text-align: center;
-}
-
-.conduit-footer-logo {
-  width: 80px;
-}
-
 .counter {
   font-size: 1.5rem;
   line-height: 1;
 }
 
-.servicemesh {
-  padding: 10px;
-  width: 20vw;
-}
-
-.conduit-mark {
-  animation: offset 30s linear forwards;
-  stroke-dasharray: 841px;
-  stroke-dashoffset: 841px;
-  animation-delay: 0s;
-  /*animation-iteration-count: infinite;*/
-}
 
 @media screen and (min-width: 638px) { 
   .footer-cta-web {
     font-weight: bold;
+    font-size: .9em;
+    line-height: 1.5em;
+    color: #fff;
   }
 
   .footer-cta {
@@ -207,6 +266,9 @@ h1 .title {
 @media screen and (max-width: 638px) { 
   .footer-cta {
     font-weight: bold;
+    font-size: .9em;
+    line-height: 1.5em;
+    color: #fff;
   }  
 
   .footer-cta-web {
