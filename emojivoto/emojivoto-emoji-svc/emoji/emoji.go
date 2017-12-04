@@ -70,7 +70,7 @@ var top100Emoji = []string{
 	":vulcan_salute:",
 	":metal:",
 	":call_me_hand:",
-	":+1:",
+	":thumbsup:",
 	":wave:",
 	":clap:",
 	":raised_hands:",
@@ -133,19 +133,13 @@ func (allEmoji *inMemoryAllEmoji) WithShortcode(shortcode string) *Emoji {
 }
 
 func NewAllEmoji() AllEmoji {
-	emojiSet := make(map[string]*Emoji, 0)
-
-	for name, unicode := range emojiCodeMap {
-		emojiSet[unicode] = &Emoji{
-			Unicode:   unicode,
-			Shortcode: name,
-		}
-	}
-
 	emojiList := make([]*Emoji, 0)
 
-	for _, alias := range top100Emoji {
-		e := emojiSet[emojiCodeMap[alias]]
+	for _, name := range top100Emoji {
+		e := &Emoji{
+			Unicode:   emojiCodeMap[name],
+			Shortcode: name,
+		}
 		emojiList = append(emojiList, e)
 	}
 

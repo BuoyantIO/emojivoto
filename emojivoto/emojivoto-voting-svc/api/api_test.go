@@ -8,7 +8,7 @@ import (
 	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 )
 
-func TestVote(t *testing.T) {
+func TestVoteJoy(t *testing.T) {
 	t.Run("Computes vote", func(t *testing.T) {
 		ctx := context.Background()
 		poll := voting.NewPoll()
@@ -16,12 +16,10 @@ func TestVote(t *testing.T) {
 			poll: poll,
 		}
 
-		shortcodeVotedFor := ":wave:"
+		shortcodeVotedFor := ":joy:"
 
-		request := pb.VoteRequest{
-			Shortcode: shortcodeVotedFor,
-		}
-		_, err := emojivotoService.Vote(ctx, &request)
+		request := pb.VoteRequest{}
+		_, err := emojivotoService.VoteJoy(ctx, &request)
 
 		if err != nil {
 			t.Fatal(err)
@@ -43,10 +41,11 @@ func TestLeaderboard(t *testing.T) {
 
 		votedForTwice := ":wave:"
 		votedForOnce := ":ghost:"
+		voteRequest := &pb.VoteRequest{}
 
-		emojivotoService.Vote(ctx, &pb.VoteRequest{Shortcode: votedForTwice})
-		emojivotoService.Vote(ctx, &pb.VoteRequest{Shortcode: votedForTwice})
-		emojivotoService.Vote(ctx, &pb.VoteRequest{Shortcode: votedForOnce})
+		emojivotoService.VoteWave(ctx, voteRequest)
+		emojivotoService.VoteWave(ctx, voteRequest)
+		emojivotoService.VoteGhost(ctx, voteRequest)
 
 		response, err := emojivotoService.Results(context.Background(), &pb.ResultsRequest{})
 
