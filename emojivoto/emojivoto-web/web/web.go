@@ -15,6 +15,7 @@ import (
 type WebApp struct {
 	emojiServiceClient  pb.EmojiServiceClient
 	votingServiceClient pb.VotingServiceClient
+	indexBundle         string
 }
 
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
@@ -315,6 +316,14 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 	<html>
 		<head>
 			<meta charset="UTF-8">
+			<!-- Global site tag (gtag.js) - Google Analytics -->
+			<script async src="https://www.googletagmanager.com/gtag/js?id=UA-60040560-4"></script>
+			<script>
+			  window.dataLayer = window.dataLayer || [];
+			  function gtag(){dataLayer.push(arguments);}
+			  gtag('js', new Date());
+			  gtag('config', 'UA-60040560-4');
+			</script>
 		</head>
 		<body>
 			<div id="main" class="main"></div>
@@ -326,7 +335,7 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *WebApp) jsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/javascript")
-	f, err := ioutil.ReadFile("./index_bundle.js")
+	f, err := ioutil.ReadFile(app.indexBundle)
 	if err != nil {
 		panic(err)
 	}
@@ -348,10 +357,11 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
-func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
+func StartServer(webPort, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
 		votingServiceClient: votingClient,
+		indexBundle:         indexBundle,
 	}
 
 	log.Printf("Starting web server on WEB_PORT=[%s]", webPort)
