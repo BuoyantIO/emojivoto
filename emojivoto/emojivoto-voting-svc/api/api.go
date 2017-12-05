@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
-	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 	"google.golang.org/grpc"
 )
 

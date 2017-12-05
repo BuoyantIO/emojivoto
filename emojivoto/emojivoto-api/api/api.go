@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-api/gen/proto"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-api/gen/proto"
 	"context"
 	"strings"
 	"errors"

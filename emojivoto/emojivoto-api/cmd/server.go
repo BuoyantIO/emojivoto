@@ -4,8 +4,8 @@ import (
 	"os"
 	"log"
 	"google.golang.org/grpc"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-api/gen/proto"
-	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-api/api"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-api/gen/proto"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-api/api"
 )
 
 var (
