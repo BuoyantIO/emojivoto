@@ -316,6 +316,8 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 	<html>
 		<head>
 			<meta charset="UTF-8">
+			<title>Emoji Vote</title>
+			<link rel="icon" href="/img/favicon.ico">
 			<!-- Global site tag (gtag.js) - Google Analytics -->
 			<script async src="https://www.googletagmanager.com/gtag/js?id=UA-60040560-4"></script>
 			<script>
@@ -340,6 +342,10 @@ func (app *WebApp) jsHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	fmt.Fprint(w, string(f))
+}
+
+func (app *WebApp) faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./web/favicon.ico")
 }
 
 func writeJsonBody(w http.ResponseWriter, status int, body interface{}) error {
@@ -368,6 +374,7 @@ func StartServer(webPort, indexBundle string, emojiServiceClient pb.EmojiService
 	http.HandleFunc("/", webApp.indexHandler)
 	http.HandleFunc("/leaderboard", webApp.indexHandler)
 	http.HandleFunc("/js", webApp.jsHandler)
+	http.HandleFunc("/img/favicon.ico", webApp.faviconHandler)
 	http.HandleFunc("/api/list", webApp.listEmojiHandler)
 	http.HandleFunc("/api/vote", webApp.voteEmojiHandler)
 	http.HandleFunc("/api/leaderboard", webApp.leaderboardHandler)
