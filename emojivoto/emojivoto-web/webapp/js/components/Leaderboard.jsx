@@ -51,7 +51,9 @@ export default class Leaderboard extends React.Component {
   render() {
     return (
       <div className="background">
-        <div className="page-content">
+        <div className="page-content container-fluid">
+        <div className="row">
+          <div className="col-md-12">
             {!this.state.error ? null : <div className="error">Error loading leaderboard.</div>}
             <h1>EMOJI VOTE LEADERBOARD </h1>
             <div className="btn btn-blue"><Link to="/">Vote on your favorite</Link></div>
@@ -74,6 +76,8 @@ export default class Leaderboard extends React.Component {
                   <p className="footer-cta-web">Click here to learn more about Conduit</p>
                 </div>
               </a>
+            </div>
+            </div>
             </div>
         </div>
     );

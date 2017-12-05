@@ -64,11 +64,15 @@ export default class Vote extends React.Component {
     if (this.state.error) {
       return (
         <div className="background-500">
-        <div className="page-content">
+        <div className="page-content container-fluid">
+          <div className="row">
+          <div className="col-md-12">
           <h1 className="title">Uh oh.</h1>
           <h1 className="headline">🚧</h1>
           <p>We couldn't process your request.</p>
           <div className="btn btn-blue"><Link to="/" onClick={this.resetState}>Select again</Link></div>
+          </div>
+          </div>
         </div>
       </div>
       );
@@ -76,7 +80,9 @@ export default class Vote extends React.Component {
       let emojiList = this.state.emojiList;
       return (
         <div className="background">
-          <div className="page-content">
+          <div className="page-content container-fluid">
+            <div className="row">
+            <div className="col-md-12">
             <h1 className="headline">🗳</h1>
             <h1>EMOJI VOTE</h1>
             <p>Tap to vote for your favorite emoji below</p>
@@ -88,18 +94,24 @@ export default class Vote extends React.Component {
                 <p>© 2017 Buoyant, Inc. All Rights Reserved.</p>
               </div>
             </div>
+            </div>
+          </div>
           </div>
         </div>
       );
     } else {
       return (
         <div className="background">
-          <div className="page-content">
+          <div className="page-content container-fluid">
+            <div className="row">
+            <div className="col-md-12">
             <h1>You picked:</h1>
             <h1 className="headline">{this.state.selectedEmoji.unicode}</h1>
             <p>See how you stack up against others</p>
             <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
             <div className="btn btn-white"><Link to="/" onClick={this.resetState}>Pick another one</Link></div>
+            </div>
+          </div>
           </div>
         </div>
       );
