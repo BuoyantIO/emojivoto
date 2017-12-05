@@ -1,70 +1,58 @@
 # Emoji.voto
 
-A demo app for the Conduit service mesh
+A microservice application that allows users to vote for their favorite emoji,
+and tracks votes received on a leaderboard. May the best emoji win.
 
-## Demo Instructions (Minikube)
+The application is composed of the following 3 services:
 
-0. Pull images and install CLI (pre-release)
+* [emojivoto-web](emojivoto-web/): Web frontend and REST API
+* [emojivoto-emoji-svc](emojivoto-emoji-svc/): gRPC API for finding and listing emoji
+* [emojivoto-voting-svc](emojivoto-voting-svc/): gRPC API for voting and leaderboard
+
+## Running
+
+### In Minikube
+
+Deploy the application to Minikube using the Conduit service mesh.
+
+1. Install the Conduit CLI
 
 ```
-# In the boron repo:
-
-gcloud docker --authorize-only
-bin/mkube bin/docker-pull latest
-go install ./conduit
+curl https://run.conduit.io/install | sh
 ```
 
-1. Install Conduit
+2. Install Conduit
 
 ```
 conduit install | kubectl apply -f -
 ```
 
-2. Build Votemoji images
-
-```
-eval $(minikube docker-env)
-make build-base-docker-image build
-```
-
-3. Inject, Deploy, and Enjoy
-
-```
-conduit inject emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
-```
-
-4. Use the app!
-
-```
-minikube -n emojivoto service web-svc
-```
-
-5. View the dashboard!
+3. View the dashboard!
 
 ```
 conduit dashboard
 ```
 
-### Docker Instructions
+4. Inject, Deploy, and Enjoy
 
-To run the app locally with docker-compose:
+```
+conduit inject emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
+```
+
+5. Use the app!
+
+```
+minikube -n emojivoto service web-svc
+```
+
+### In docker-compose
+
+It's also possible to run the app with docker-compose (without Conduit).
+
+Build and run:
 
 ```
 make deploy-to-docker-compose
 ```
 
 The web app will be running on port 8080 of your docker host.
-
-### Local Development Instructions
-
-To update the Docker images with local changes:
-
-```
-make build
-```
-
-To update just webapp dependencies (JS, CSS, assets):
-
-```
-make web
-```
