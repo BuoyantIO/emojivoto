@@ -21,25 +21,25 @@ Deploy the application to Minikube using the Conduit service mesh.
 curl https://run.conduit.io/install | sh
 ```
 
-1. Install Conduit
+2. Install Conduit
 
 ```
 conduit install | kubectl apply -f -
 ```
 
-2. Inject, Deploy, and Enjoy
+3. Inject, Deploy, and Enjoy
 
 ```
 conduit inject emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
 ```
 
-3. Use the app!
+4. Use the app!
 
 ```
 minikube -n emojivoto service web-svc
 ```
 
-4. View the dashboard!
+5. View the dashboard!
 
 ```
 conduit dashboard
