@@ -2,8 +2,8 @@ package api
 
 import (
 	"testing"
-	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
 	"context"
 )
 

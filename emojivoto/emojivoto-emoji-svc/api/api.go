@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"google.golang.org/grpc"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
-	"github.com/buoyantio/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
 )
 
 type EmojiServiceServer struct {

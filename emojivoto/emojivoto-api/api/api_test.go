@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"context"
 	"google.golang.org/grpc"
-	pb "github.com/buoyantio/conduit-examples/emojivoto/emojivoto-api/gen/proto"
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-api/gen/proto"
 )
 
 type MockEmojiServiceClient struct {
