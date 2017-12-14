@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -27,32 +27,21 @@ type emoji struct {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	var sleep = flag.Duration("sleep", 100*time.Millisecond, "time to sleep between votes")
-
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: emojivoto-vote-bot [options] <target>\n")
-		fmt.Fprintf(os.Stderr, "       where <target> is host:port of web service, and [options] include:\n")
-		flag.PrintDefaults()
+	webHost := os.Getenv("WEB_HOST")
+	if webHost == "" {
+		log.Fatalf("WEB_HOST environment variable must me set")
 	}
 
-	flag.Parse()
-	if flag.NArg() != 1 {
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	host := "http://" + flag.Arg(0)
-	if _, err := url.Parse(host); err != nil {
-		fmt.Fprintf(os.Stderr, "Invalid target: %s\n", flag.Arg(0))
-		flag.Usage()
-		os.Exit(1)
+	webUrl := "http://" + webHost
+	if _, err := url.Parse(webUrl); err != nil {
+		log.Fatalf("WEB_HOST %s is invalid", webHost)
 	}
 
 	for {
-		time.Sleep(*sleep)
+		time.Sleep(300 * time.Millisecond)
 
 		// Get the list of available shortcodes
-		shortcodes, err := shortcodes(host)
+		shortcodes, err := shortcodes(webUrl)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			continue
@@ -62,29 +51,21 @@ func main() {
 		probability := rand.Float32()
 		switch {
 		case probability < 0.15:
-			err = vote(host, ":doughnut:")
+			err = vote(webUrl, ":doughnut:")
 		case probability < 0.35:
-			err = vote(host, ":poop:")
+			err = vote(webUrl, ":poop:")
 		default:
 			random := shortcodes[rand.Intn(len(shortcodes))]
-			err = vote(host, random)
+			err = vote(webUrl, random)
 		}
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
-			continue
-		}
-
-		// Get the leaderboard
-		err = leaderboard(host)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			continue
 		}
 	}
 }
 
-func shortcodes(host string) ([]string, error) {
-	url := fmt.Sprintf("%s/api/list", host)
+func shortcodes(webUrl string) ([]string, error) {
+	url := fmt.Sprintf("%s/api/list", webUrl)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -111,21 +92,9 @@ func shortcodes(host string) ([]string, error) {
 	return shortcodes, nil
 }
 
-func vote(host string, shortcode string) error {
+func vote(webUrl string, shortcode string) error {
 	fmt.Printf("✔ Voting for %s\n", shortcode)
-	url := fmt.Sprintf("%s/api/vote?choice=%s", host, shortcode)
-
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
-}
-
-func leaderboard(host string) error {
-	url := fmt.Sprintf("%s/api/leaderboard", host)
+	url := fmt.Sprintf("%s/api/vote?choice=%s", webUrl, shortcode)
 
 	resp, err := http.Get(url)
 	if err != nil {

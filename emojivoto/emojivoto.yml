@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: emoji-svc
-        image: buoyantio/emojivoto-emoji-svc:v1
+        image: buoyantio/emojivoto-emoji-svc:v2
         env:
         - name: GRPC_PORT
           value: "8080"
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
       - name: voting-svc
-        image: buoyantio/emojivoto-voting-svc:v1
+        image: buoyantio/emojivoto-voting-svc:v2
         env:
         - name: GRPC_PORT
           value: "8080"
@@ -99,7 +99,7 @@ spec:
     spec:
       containers:
       - name: web-svc
-        image: buoyantio/emojivoto-web:v1
+        image: buoyantio/emojivoto-web:v2
         env:
         - name: WEB_PORT
           value: "80"
@@ -113,14 +113,11 @@ spec:
         - name: http
           containerPort: 80
       - name: vote-bot
-        image: buoyantio/emojivoto-web:v1
-        command:
-        - "/bin/sh"
-        args:
-        - "-c"
-        - |
-          sleep 15 # wait for pods to start
-          emojivoto-vote-bot localhost:80
+        image: buoyantio/emojivoto-web:v2
+        command: ["emojivoto-vote-bot"]
+        env:
+        - name: WEB_HOST
+          value: "localhost:80"
 ---
 apiVersion: v1
 kind: Service
