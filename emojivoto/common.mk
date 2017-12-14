@@ -17,7 +17,7 @@ protoc:
 package: protoc dep compile build-container
 
 build-container:
-	docker build .. -t "buoyantio/$(svc_name):v1" --build-arg svc_name=$(svc_name)
+	docker build .. -t "buoyantio/$(svc_name):v2" --build-arg svc_name=$(svc_name)
 
 compile:
 	GOOS=linux go build -v -o $(target_dir)/$(svc_name) cmd/server.go
