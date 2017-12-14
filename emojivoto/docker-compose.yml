@@ -14,6 +14,15 @@ services:
       - voting-svc
       - emoji-svc
 
+  vote-bot:
+    image: buoyantio/emojivoto-web:v1
+    entrypoint: emojivoto-vote-bot
+    command:
+      - "-sleep=1s"
+      - "web:8080"
+    depends_on:
+      - web
+
   emoji-svc:
     image: buoyantio/emojivoto-emoji-svc:v1
     environment:
