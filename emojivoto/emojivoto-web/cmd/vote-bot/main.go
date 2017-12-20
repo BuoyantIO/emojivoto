@@ -38,7 +38,7 @@ func main() {
 	}
 
 	for {
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(time.Second)
 
 		// Get the list of available shortcodes
 		shortcodes, err := shortcodes(webUrl)
