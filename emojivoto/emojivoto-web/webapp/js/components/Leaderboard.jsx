@@ -3,14 +3,6 @@ import _ from 'lodash';
 import 'whatwg-fetch';
 import { Link } from 'react-router-dom';
 
-
-// TODO: Remove? (not currently)
-// const randomLeaderboard = () => _.map(emo => {
-//   return {
-//     unicode: emo.unicode,
-//     votes: Math.round(Math.random() * 1000)
-//   }
-// });
 export default class Leaderboard extends React.Component {
   constructor(props) {
     super(props);
@@ -31,10 +23,6 @@ export default class Leaderboard extends React.Component {
         });
       }).catch(e => this.setState({ error: e }));
     }).catch(e => this.setState({ error: e }));
-
-    // TODO: Remove? (not currently)
-    // let leaderboard = randomLeaderboard();
-    // this.setState({ leaderboard: _.orderBy(leaderboard, 'votes', 'desc') });
   }
 
   renderLeaderboard() {
