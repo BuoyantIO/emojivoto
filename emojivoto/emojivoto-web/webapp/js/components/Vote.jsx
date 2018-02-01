@@ -66,7 +66,7 @@ export default class Vote extends React.Component {
     return _.map(emojis, (emoji, i) => {
       return (
         <div
-          className="emoji"
+          className="emoji emoji-votable"
           key={`emoji-${i}`}
           onClick={e => this.vote(emoji)}
         >
