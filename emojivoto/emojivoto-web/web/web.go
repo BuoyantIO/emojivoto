@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ type WebApp struct {
 	emojiServiceClient  pb.EmojiServiceClient
 	votingServiceClient pb.VotingServiceClient
 	indexBundle         string
+	webpackDevServer    string
 }
 
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
@@ -311,6 +313,7 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+
 	indexTemplate := `
 	<!DOCTYPE html>
 	<html>
@@ -330,9 +333,17 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 		<body>
 			<div id="main" class="main"></div>
 		</body>
-		<script type="text/javascript" src="/js" async></script>
+		{{ if ne . ""}}
+			<script type="text/javascript" src="{{ . }}/dist/index_bundle.js" async></script>
+		{{else}}
+			<script type="text/javascript" src="/js" async></script>
+		{{end}}
 	</html>`
-	fmt.Fprint(w, indexTemplate)
+	t, err := template.New("indexTemplate").Parse(indexTemplate)
+	if err != nil {
+		panic(err)
+	}
+	t.Execute(w, app.webpackDevServer)
 }
 
 func (app *WebApp) jsHandler(w http.ResponseWriter, r *http.Request) {
@@ -363,11 +374,12 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
-func StartServer(webPort, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
+func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
 		votingServiceClient: votingClient,
 		indexBundle:         indexBundle,
+		webpackDevServer:    webpackDevServer,
 	}
 
 	log.Printf("Starting web server on WEB_PORT=[%s]", webPort)
