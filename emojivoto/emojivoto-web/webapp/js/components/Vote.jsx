@@ -48,16 +48,14 @@ export default class Vote extends React.Component {
 
   vote(emoji) {
     fetch(`/api/vote?choice=${emoji.shortcode}`).then(rsp => {
-        if (rsp.ok) {
-          this.setState({ selectedEmoji: emoji, error: null });
-        } else {
-          throw new Error("Unable to Register Vote");
-        }}).catch(e => {
-          console.error(e);
-          this.setState({ error: e.toString() });
-        });
-    console.log(emoji);
-    this.setState({ selectedEmoji: emoji }); // TODO: remove
+      if (rsp.ok) {
+        this.setState({ selectedEmoji: emoji, error: null });
+      } else {
+        throw new Error("Unable to Register Vote");
+      }
+    }).catch(e => {
+        this.setState({ selectedEmoji: emoji, error: e.toString() });
+      });
   }
 
   resetState() {
@@ -78,14 +76,21 @@ export default class Vote extends React.Component {
     });
   }
 
+  renderLeaderboardLink() {
+    return <Link to="/leaderboard"><div className="btn btn-blue">View the leaderboard</div></Link>;
+  }
+
   render() {
     if (this.state.error) {
-      console.log(this.state.selectedEmoji);
+      let errorMessage = "We couldn't process your request.";
+      if(this.state.selectedEmoji.shortcode === ":poop:") {
+        errorMessage = "The VotePoop endpoint always returns 500s for this demo."
+      }
 
       let contents = (
         <div>
-          <p>We couldn't process your request.</p>
-          <div className="btn btn-blue"><Link to="/" onClick={this.resetState}>Select again</Link></div>
+          <p>{errorMessage}</p>
+          <Link to="/" onClick={this.resetState}><div className="btn btn-blue">Select again</div></Link>
         </div>
       );
 
@@ -94,7 +99,6 @@ export default class Vote extends React.Component {
         headline="🚧"
         contents={contents}
         containerClass="background-500"
-        is404="true"
       />;
     } else if (!this.state.selectedEmoji) {
       let emojiList = this.state.emojiList;
@@ -102,7 +106,7 @@ export default class Vote extends React.Component {
         <div>
           <h1>EMOJI VOTE</h1>
           <p>Tap to vote for your favorite emoji below</p>
-          <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
+          {this.renderLeaderboardLink()}
           {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
 
           <div className="emoji-list">
@@ -125,8 +129,8 @@ export default class Vote extends React.Component {
       let contents = (
         <div>
           <p>See how you stack up against others</p>
-          <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
-          <div className="btn btn-white"><Link to="/" onClick={this.resetState}>Pick another one</Link></div>
+          {this.renderLeaderboardLink()}
+          <Link to="/" onClick={this.resetState}><div className="btn btn-white">Pick another one</div></Link>
         </div>
       );
       return <EmojiVotoPage
