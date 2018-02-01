@@ -81,7 +81,6 @@ export default class Vote extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     if (this.state.error) {
       let errorMessage = <p>We couldn't process your request.</p>;
       if(this.state.selectedEmoji.shortcode === ":poop:") {
