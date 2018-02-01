@@ -82,14 +82,19 @@ export default class Vote extends React.Component {
 
   render() {
     if (this.state.error) {
-      let errorMessage = "We couldn't process your request.";
+      let errorMessage = <p>We couldn't process your request.</p>;
       if(this.state.selectedEmoji.shortcode === ":poop:") {
-        errorMessage = "The VotePoop endpoint always returns 500s for this demo."
+        errorMessage = (<div>
+          <p className="poop-explanation">For the sake of this demo, voting for 💩<br />
+            always returns an error.
+          </p>
+          <p>Get your mind out of the gutter, and <Link to="/">pick another</Link>!</p>
+        </div>);
       }
 
       let contents = (
         <div>
-          <p>{errorMessage}</p>
+          {errorMessage}
           <Link to="/" onClick={this.resetState}><div className="btn btn-blue">Select again</div></Link>
         </div>
       );
