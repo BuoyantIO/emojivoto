@@ -8,7 +8,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
-  name: emoji-svc
+  name: emoji
   namespace: emojivoto
 spec:
   replicas: 1
@@ -52,7 +52,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
-  name: voting-svc
+  name: voting
   namespace: emojivoto
 spec:
   replicas: 1
@@ -96,7 +96,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
-  name: web-svc
+  name: web
   namespace: emojivoto
 spec:
   replicas: 1
