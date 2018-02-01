@@ -2,6 +2,23 @@ import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import 'whatwg-fetch';
+
+const EmojiVotoPage = ({headline, contents, containerClass, preHeadline}) => {
+  return (
+    <div className={containerClass}>
+      <div className="page-content container-fluid">
+        <div className="row">
+          <div className="col-md-12">
+            {!preHeadline ? null : preHeadline}
+            <h1 className="headline">{headline}</h1>
+
+            {contents}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 export default class Vote extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +56,7 @@ export default class Vote extends React.Component {
           console.error(e);
           this.setState({ error: e.toString() });
         });
+    console.log(emoji);
     this.setState({ selectedEmoji: emoji }); // TODO: remove
   }
 
@@ -62,59 +80,61 @@ export default class Vote extends React.Component {
 
   render() {
     if (this.state.error) {
-      return (
-        <div className="background-500">
-        <div className="page-content container-fluid">
-          <div className="row">
-          <div className="col-md-12">
-          <h1 className="title">Uh oh.</h1>
-          <h1 className="headline">🚧</h1>
+      console.log(this.state.selectedEmoji);
+
+      let contents = (
+        <div>
           <p>We couldn't process your request.</p>
           <div className="btn btn-blue"><Link to="/" onClick={this.resetState}>Select again</Link></div>
-          </div>
-          </div>
         </div>
-      </div>
       );
+
+      return <EmojiVotoPage
+        preHeadline={<h1 className="title">Uh oh.</h1>}
+        headline="🚧"
+        contents={contents}
+        containerClass="background-500"
+        is404="true"
+      />;
     } else if (!this.state.selectedEmoji) {
       let emojiList = this.state.emojiList;
-      return (
-        <div className="background">
-          <div className="page-content container-fluid">
-            <div className="row">
-            <div className="col-md-12">
-            <h1 className="headline">🗳</h1>
-            <h1>EMOJI VOTE</h1>
-            <p>Tap to vote for your favorite emoji below</p>
-            <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
-            {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
-            <div className="emoji-list">{this.renderEmojiList(emojiList)}
-              <div className="footer-text">
-                <p>A <a href='https://buoyant.io'>Buoyant</a> social experiment</p>
-                <p>© 2017 Buoyant, Inc. All Rights Reserved.</p>
-              </div>
+      let contents = (
+        <div>
+          <h1>EMOJI VOTE</h1>
+          <p>Tap to vote for your favorite emoji below</p>
+          <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
+          {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
+
+          <div className="emoji-list">
+            {this.renderEmojiList(emojiList)}
+
+            <div className="footer-text">
+              <p>A <a href='https://buoyant.io'>Buoyant</a> social experiment</p>
+              <p>© 2017 Buoyant, Inc. All Rights Reserved.</p>
             </div>
-            </div>
-          </div>
           </div>
         </div>
       );
+
+      return <EmojiVotoPage
+        headline="🗳"
+        contents={contents}
+        containerClass="background"
+      />;
     } else {
-      return (
-        <div className="background">
-          <div className="page-content container-fluid">
-            <div className="row">
-            <div className="col-md-12">
-            <h1>You picked:</h1>
-            <h1 className="headline">{this.state.selectedEmoji.unicode}</h1>
-            <p>See how you stack up against others</p>
-            <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
-            <div className="btn btn-white"><Link to="/" onClick={this.resetState}>Pick another one</Link></div>
-            </div>
-          </div>
-          </div>
+      let contents = (
+        <div>
+          <p>See how you stack up against others</p>
+          <div className="btn btn-blue"><Link to="/leaderboard">View the leaderboard</Link></div>
+          <div className="btn btn-white"><Link to="/" onClick={this.resetState}>Pick another one</Link></div>
         </div>
       );
+      return <EmojiVotoPage
+        preHeadline={<h1>You picked:</h1>}
+        headline={this.state.selectedEmoji.unicode}
+        contents={contents}
+        containerClass ="background"
+      />;
     }
   }
 }
