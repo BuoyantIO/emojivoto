@@ -24,6 +24,7 @@ export default class Leaderboard extends React.Component {
   }
 
   loadFromServer(emoji) {
+    // test DCO
     fetch('/api/leaderboard').then(r => {
       r.json().then(emojis => {
         this.setState({
