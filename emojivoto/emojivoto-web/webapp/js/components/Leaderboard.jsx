@@ -56,7 +56,7 @@ export default class Leaderboard extends React.Component {
           <div className="col-md-12">
             {!this.state.error ? null : <div className="error">Error loading leaderboard.</div>}
             <h1>EMOJI VOTE LEADERBOARD </h1>
-            <div className="btn btn-blue"><Link to="/">Vote on your favorite</Link></div>
+            <Link to="/"><div className="btn btn-blue">Vote on your favorite</div></Link>
             <div className="emoji-list">{this.renderLeaderboard()}
               <div className="footer-text">
                 <p className="footer-experiment">A <a href='https://buoyant.io'>Buoyant</a> social experiment</p>
