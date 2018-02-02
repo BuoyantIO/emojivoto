@@ -66,7 +66,7 @@ export default class Vote extends React.Component {
     return _.map(emojis, (emoji, i) => {
       return (
         <div
-          className="emoji"
+          className="emoji emoji-votable"
           key={`emoji-${i}`}
           onClick={e => this.vote(emoji)}
         >
@@ -88,7 +88,7 @@ export default class Vote extends React.Component {
           <p className="poop-explanation">For the sake of this demo, voting for 💩<br />
             always returns an error.
           </p>
-          <p>Get your mind out of the gutter, and <Link to="/">pick another</Link>!</p>
+          <p>Get your mind out of the gutter, and <Link to="/" onClick={this.resetState}>pick another</Link>!</p>
         </div>);
       }
 
