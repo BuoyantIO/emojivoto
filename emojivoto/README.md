@@ -75,3 +75,52 @@ If you'd like to run the bot manually:
 export WEB_HOST=localhost:8080 # replace with your web location
 go run emojivoto-web/cmd/vote-bot/main.go
 ```
+
+## Local Development
+
+### Emojivoto webapp
+
+This app is written with React and bundled with webpack.
+Use the following to run the emojivoto go services and develop on the frontend.
+
+Start the voting service
+```
+export GRPC_PORT=8081
+go run emojivoto-voting-svc/cmd/server.go
+```
+
+[In a separate teminal window] Start the emoji service
+```
+export GRPC_PORT=8082
+go run emojivoto-emoji-svc/cmd/server.go
+```
+
+[In a separate teminal window] Bundle the frontend assets
+```
+cd emojivoto-web/webapp
+yarn install
+yarn webpack # one time asset-bundling OR
+yarn webpack-dev-server --port 8083 # bundle/serve reloading assets
+```
+
+[In a separate teminal window] Start the web service
+```
+export WEB_PORT=8080
+export VOTINGSVC_HOST=localhost:8081
+export EMOJISVC_HOST=localhost:8082
+
+# if you ran yarn webpack
+export INDEX_BUNDLE=webapp/dist/index_bundle.js
+
+# if you ran yarn webpack-dev-server
+export WEBPACK_DEV_SERVER=http://localhost:8083
+
+# start the webserver
+go run emojivoto-web/cmd/server.go
+```
+
+[Optional] Start the vote bot for automatic traffic generation.
+```
+export WEB_HOST=localhost:8080
+go run emojivoto-web/cmd/vote-bot/main.go
+```
