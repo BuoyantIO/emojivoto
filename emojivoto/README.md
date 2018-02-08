@@ -85,14 +85,12 @@ Use the following to run the emojivoto go services and develop on the frontend.
 
 Start the voting service
 ```
-export GRPC_PORT=8081
-go run emojivoto-voting-svc/cmd/server.go
+GRPC_PORT=8081 go run emojivoto-voting-svc/cmd/server.go
 ```
 
 [In a separate teminal window] Start the emoji service
 ```
-export GRPC_PORT=8082
-go run emojivoto-emoji-svc/cmd/server.go
+GRPC_PORT=8082 go run emojivoto-emoji-svc/cmd/server.go
 ```
 
 [In a separate teminal window] Bundle the frontend assets
@@ -110,7 +108,7 @@ export VOTINGSVC_HOST=localhost:8081
 export EMOJISVC_HOST=localhost:8082
 
 # if you ran yarn webpack
-export INDEX_BUNDLE=webapp/dist/index_bundle.js
+export INDEX_BUNDLE=emojivoto-web/webapp/dist/index_bundle.js
 
 # if you ran yarn webpack-dev-server
 export WEBPACK_DEV_SERVER=http://localhost:8083
