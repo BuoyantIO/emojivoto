@@ -1,4 +1,4 @@
-FROM buoyantio/emojivoto-svc-base:v1
+FROM buoyantio/emojivoto-svc-base:v3
 
 ARG svc_name
 
