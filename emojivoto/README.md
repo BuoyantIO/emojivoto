@@ -76,6 +76,20 @@ export WEB_HOST=localhost:8080 # replace with your web location
 go run emojivoto-web/cmd/vote-bot/main.go
 ```
 
+## Releasing a new version
+
+To update the docker images:
+1. Update the tag name in `common.mk`
+2. Run `mk build`
+3. Push the docker images to hub.docker.com
+```bash
+docker login
+docker push buoyantio/emojivoto-emoji-svc:v3
+docker push buoyantio/emojivoto-voting-svc:v3
+docker push buoyantio/emojivoto-web:v3
+```
+4. Update `emojivoto.yml`
+
 ## Local Development
 
 ### Emojivoto webapp
