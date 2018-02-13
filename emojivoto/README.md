@@ -81,16 +81,17 @@ go run emojivoto-web/cmd/vote-bot/main.go
 To update the docker images:
 1. Update the tag name in `common.mk`
 2. Update the base image tags in `Makefile` and `Dockerfile`
-3. Build base docker images `make build-base-docker-image`
-3. Build docker images `make build`
-4. Push the docker images to hub.docker.com
+3. Build base docker image `make build-base-docker-image`
+4. Build docker images `make build`
+5. Push the docker images to hub.docker.com
 ```bash
 docker login
+docker push buoyantio/emojivoto-svc-base:v3
 docker push buoyantio/emojivoto-emoji-svc:v3
 docker push buoyantio/emojivoto-voting-svc:v3
 docker push buoyantio/emojivoto-web:v3
 ```
-5. Update `emojivoto.yml`, `docker-compose.yml`
+6. Update `emojivoto.yml`, `docker-compose.yml`
 
 
 ## Local Development
