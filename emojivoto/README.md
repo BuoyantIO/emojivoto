@@ -36,7 +36,7 @@ conduit dashboard
 4. Inject, Deploy, and Enjoy
 
 ```
-conduit inject emojivoto.yml --skip-inbound-ports=80 | kubectl apply -f -
+conduit inject emojivoto.yml | kubectl apply -f -
 ```
 
 5. Use the app!
