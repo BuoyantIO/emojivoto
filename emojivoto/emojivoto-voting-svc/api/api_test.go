@@ -58,11 +58,11 @@ func TestLeaderboard(t *testing.T) {
 		}
 
 		if response.Results[0].Shortcode != votedForTwice || response.Results[0].Votes != 2 {
-			t.Fatalf("Expected results to be [%s,%s], found: [%v]", votedForTwice, 2, response.Results)
+			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForTwice, 2, response.Results)
 		}
 
 		if response.Results[1].Shortcode != votedForOnce || response.Results[1].Votes != 1 {
-			t.Fatalf("Expected results to be [%s,%s], found: [%v]", votedForOnce, 1, response.Results)
+			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForOnce, 1, response.Results)
 		}
 	})
 }

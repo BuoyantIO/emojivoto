@@ -1,10 +1,11 @@
 package api
 
 import (
+	"context"
 	"testing"
+
 	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
 	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
-	"context"
 )
 
 func TestListAll(t *testing.T) {
@@ -80,7 +81,7 @@ func TestFindByShortcode(t *testing.T) {
 		}
 
 		if response.Emoji != nil {
-			t.Fatal("Expected to return nil for emoji, returned [%s]", response.Emoji)
+			t.Fatalf("Expected to return nil for emoji, returned [%s]", response.Emoji)
 		}
 	})
 
