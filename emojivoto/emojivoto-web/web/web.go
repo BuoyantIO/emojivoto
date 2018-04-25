@@ -16,6 +16,7 @@ import (
 type WebApp struct {
 	emojiServiceClient  pb.EmojiServiceClient
 	votingServiceClient pb.VotingServiceClient
+	emojisvcHostHTTP1   string
 	indexBundle         string
 	webpackDevServer    string
 }
@@ -87,16 +88,28 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := &pb.FindByShortcodeRequest{
-		Shortcode: emojiShortcode,
-	}
-	response, err := app.emojiServiceClient.FindByShortcode(r.Context(), request)
+	client := &http.Client{}
+	resp, err := client.Get(app.emojisvcHostHTTP1 + "/FindByShortcodeNew/" + emojiShortcode)
 	if err != nil {
-		writeError(err, w, r, http.StatusInternalServerError)
+		writeError(err, w, r, http.StatusBadRequest)
+		return
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		writeError(err, w, r, http.StatusBadRequest)
 		return
 	}
 
-	if response.Emoji == nil {
+	var selectedEmoji map[string]string
+	err = json.Unmarshal(bodyBytes, &selectedEmoji)
+	if err != nil {
+		writeError(err, w, r, http.StatusBadRequest)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if selectedEmoji == nil {
 		err = errors.New(fmt.Sprintf("Choosen emoji shortcode [%s] doesnt exist", emojiShortcode))
 		writeError(err, w, r, http.StatusBadRequest)
 		return
@@ -374,10 +387,11 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
-func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
+func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient, emojisvcHostHTTP1 string) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
 		votingServiceClient: votingClient,
+		emojisvcHostHTTP1:   emojisvcHostHTTP1,
 		indexBundle:         indexBundle,
 		webpackDevServer:    webpackDevServer,
 	}

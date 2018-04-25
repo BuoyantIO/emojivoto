@@ -6,6 +6,7 @@ services:
     environment:
       - WEB_PORT=8080
       - EMOJISVC_HOST=emoji-svc:8080
+      - EMOJISVC_HOST_HTTP1=http://emoji-svc:8888
       - VOTINGSVC_HOST=voting-svc:8080
       - INDEX_BUNDLE=dist/index_bundle.js
     ports:
