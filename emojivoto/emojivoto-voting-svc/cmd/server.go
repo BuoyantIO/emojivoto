@@ -1,17 +1,19 @@
 package main
 
 import (
-	"os"
-	"log"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 	"fmt"
+	"log"
 	"net"
-	"google.golang.org/grpc"
+	"os"
+
 	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/api"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
+	"google.golang.org/grpc"
 )
 
 var (
-	grpcPort = os.Getenv("GRPC_PORT")
+	grpcPort          = os.Getenv("GRPC_PORT")
+	emojisvcHostHTTP1 = os.Getenv("EMOJISVC_HOST_HTTP1")
 )
 
 func main() {
@@ -28,7 +30,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	api.NewGrpServer(grpcServer, poll)
+	api.NewGrpServer(grpcServer, poll, emojisvcHostHTTP1)
 	log.Printf("Starting grpc server on GRPC_PORT=[%s]", grpcPort)
 	grpcServer.Serve(lis)
 }

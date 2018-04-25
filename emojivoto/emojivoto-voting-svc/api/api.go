@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
 	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
@@ -10,11 +11,22 @@ import (
 )
 
 type PollServiceServer struct {
-	poll voting.Poll
+	emojisvcHostHTTP1 string
+	poll              voting.Poll
 }
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
-	err := pS.poll.Vote(shortcode)
+	client := &http.Client{}
+	resp, err := client.Get(pS.emojisvcHostHTTP1 + "/FindByShortcodeOld/" + shortcode)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("ERROR")
+	}
+
+	err = pS.poll.Vote(shortcode)
 	return &pb.VoteResponse{}, err
 }
 
@@ -439,9 +451,10 @@ func (pS *PollServiceServer) Results(context.Context, *pb.ResultsRequest) (*pb.R
 	return response, nil
 }
 
-func NewGrpServer(grpcServer *grpc.Server, poll voting.Poll) {
+func NewGrpServer(grpcServer *grpc.Server, poll voting.Poll, emojisvcHostHTTP1 string) {
 	server := &PollServiceServer{
-		poll,
+		emojisvcHostHTTP1: emojisvcHostHTTP1,
+		poll:              poll,
 	}
 
 	pb.RegisterVotingServiceServer(grpcServer, server)
