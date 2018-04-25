@@ -14,7 +14,7 @@ type EmojiH1Server struct {
 	newEmoji emoji.AllEmoji
 }
 
-func (s *EmojiH1Server) FindByShortcodeNew(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func (s *EmojiH1Server) FindByShortcode2(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	foundEmoji := s.newEmoji.WithShortcode(params.ByName("shortcode"))
 	if foundEmoji != nil {
 		selectedEmoji := map[string]string{
@@ -22,13 +22,13 @@ func (s *EmojiH1Server) FindByShortcodeNew(w http.ResponseWriter, req *http.Requ
 		}
 		err := json.NewEncoder(w).Encode(selectedEmoji)
 		if err != nil {
-			http.Error(w, err.Error(), 404)
+			http.Error(w, err.Error(), 500)
 			return
 		}
 	}
 }
 
-func (s *EmojiH1Server) FindByShortcodeOld(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func (s *EmojiH1Server) FindByShortcode(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	foundEmoji := s.oldEmoji.WithShortcode(params.ByName("shortcode"))
 	if foundEmoji != nil {
 		selectedEmoji := map[string]string{
@@ -36,7 +36,7 @@ func (s *EmojiH1Server) FindByShortcodeOld(w http.ResponseWriter, req *http.Requ
 		}
 		json.NewEncoder(w).Encode(selectedEmoji)
 	} else {
-		http.Error(w, "emoji not found", 404)
+		http.Error(w, "emoji not found", 500)
 	}
 }
 
@@ -54,8 +54,8 @@ func NewHTTP1Server(HTTP1Addr string, oldEmoji emoji.AllEmoji, newEmoji emoji.Al
 		newEmoji: newEmoji,
 	}
 
-	router.GET("/FindByShortcodeNew/:shortcode", server.FindByShortcodeNew)
-	router.GET("/FindByShortcodeOld/:shortcode", server.FindByShortcodeOld)
+	router.GET("/find-by-shortcode2/:shortcode", server.FindByShortcode2)
+	router.GET("/find-by-shortcode/:shortcode", server.FindByShortcode)
 
 	err := HTTP1Server.ListenAndServe()
 	if err != nil {

@@ -21,18 +21,24 @@ func main() {
 	if grpcPort == "" {
 		log.Fatalf("GRPC_PORT (currently [%s]) environment variable must me set to run the server.", grpcPort)
 	}
+	if HTTP1Addr == "" {
+		log.Fatalf("HTTP1_ADDR (currently [%s]) environment variable must me set to run the server.", HTTP1Addr)
+	}
 
 	oldEmoji := emoji.OldAllEmoji()
 	newEmoji := emoji.NewAllEmoji()
+
+	go func() {
+		log.Printf("Starting HTTP1 server on HTTP1_ADDR=[%s]", HTTP1Addr)
+		api.NewHTTP1Server(HTTP1Addr, oldEmoji, newEmoji)
+	}()
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
 		panic(err)
 	}
-	go api.NewHTTP1Server(HTTP1Addr, oldEmoji, newEmoji)
 	grpcServer := grpc.NewServer()
 	api.NewGrpServer(grpcServer, newEmoji)
 	log.Printf("Starting grpc server on GRPC_PORT=[%s]", grpcPort)
 	grpcServer.Serve(lis)
-
 }

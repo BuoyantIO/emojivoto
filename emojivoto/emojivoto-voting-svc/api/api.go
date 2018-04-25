@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
@@ -16,9 +17,10 @@ type PollServiceServer struct {
 }
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
-	client := &http.Client{}
-	resp, err := client.Get(pS.emojisvcHostHTTP1 + "/FindByShortcodeOld/" + shortcode)
+	url := pS.emojisvcHostHTTP1 + "/find-by-shortcode/" + shortcode
+	resp, err := http.Get(url)
 	if err != nil {
+		log.Printf("request to emoji service [%s] failed: %s", url, err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -31,7 +33,7 @@ func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
 }
 
 func (pS *PollServiceServer) VotePoop(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
-	return nil, fmt.Errorf("ERROR")
+	return pS.vote(":poop:")
 }
 
 func (pS *PollServiceServer) VoteJoy(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {

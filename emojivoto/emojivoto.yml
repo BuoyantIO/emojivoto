@@ -33,6 +33,8 @@ spec:
         ports:
         - containerPort: 8080
           name: grpc
+        - containerPort: 8888
+          name: http
         resources: {}
 status: {}
 ---
@@ -73,7 +75,7 @@ spec:
         - name: GRPC_PORT
           value: "8080"
         - name: EMOJISVC_HOST_HTTP1
-          value: "http:/emoji-svc.emojivoto:8888"
+          value: "http://emoji-svc.emojivoto:8888"
         image: buoyantio/emojivoto-voting-svc:v3
         name: voting-svc
         ports:

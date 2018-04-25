@@ -17,7 +17,6 @@ type inMemoryAllEmoji struct {
 }
 
 var top100Emoji = []string{
-	":poop:",
 	":joy:",
 	":sunglasses:",
 	":relaxed:",
@@ -68,6 +67,7 @@ var top100Emoji = []string{
 	":biking_man:",
 	":point_up_2:",
 	":vulcan_salute:",
+	":poop:",
 	":metal:",
 	":call_me_hand:",
 	":thumbsup:",
@@ -120,7 +120,6 @@ var top100Emoji = []string{
 }
 
 var top50Emoji = []string{
-	":poop:",
 	":joy:",
 	":sunglasses:",
 	":relaxed:",
@@ -171,6 +170,7 @@ var top50Emoji = []string{
 	":biking_man:",
 	":point_up_2:",
 	":vulcan_salute:",
+	":poop:",
 }
 
 func (allEmoji *inMemoryAllEmoji) List() []*Emoji {

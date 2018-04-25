@@ -1,70 +1,80 @@
 package api
 
-// import (
-// 	"context"
-// 	"testing"
+import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// 	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
-// 	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
-// )
+	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
+	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
+)
 
-// func TestVoteJoy(t *testing.T) {
-// 	t.Run("Computes vote", func(t *testing.T) {
-// 		ctx := context.Background()
-// 		poll := voting.NewPoll()
-// 		emojivotoService := PollServiceServer{
-// 			poll: poll,
-// 		}
+func TestVoteJoy(t *testing.T) {
+	t.Run("Computes vote", func(t *testing.T) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+		defer ts.Close()
 
-// 		shortcodeVotedFor := ":joy:"
+		ctx := context.Background()
+		poll := voting.NewPoll()
+		emojivotoService := PollServiceServer{
+			emojisvcHostHTTP1: ts.URL,
+			poll:              poll,
+		}
 
-// 		request := pb.VoteRequest{}
-// 		_, err := emojivotoService.VoteJoy(ctx, &request)
+		shortcodeVotedFor := ":joy:"
 
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
+		request := pb.VoteRequest{}
+		_, err := emojivotoService.VoteJoy(ctx, &request)
 
-// 		if r, _ := poll.Results(); len(r) == 0 || r[0].Shortcode != shortcodeVotedFor {
-// 			t.Fatalf("Voted for [%s] but results were [%v]", shortcodeVotedFor, r)
-// 		}
-// 	})
-// }
+		if err != nil {
+			t.Fatal(err)
+		}
 
-// func TestLeaderboard(t *testing.T) {
-// 	t.Run("Returns expected leaderboard", func(t *testing.T) {
-// 		ctx := context.Background()
-// 		poll := voting.NewPoll()
-// 		emojivotoService := PollServiceServer{
-// 			poll: poll,
-// 		}
+		if r, _ := poll.Results(); len(r) == 0 || r[0].Shortcode != shortcodeVotedFor {
+			t.Fatalf("Voted for [%s] but results were [%v]", shortcodeVotedFor, r)
+		}
+	})
+}
 
-// 		votedForTwice := ":wave:"
-// 		votedForOnce := ":ghost:"
-// 		voteRequest := &pb.VoteRequest{}
+func TestLeaderboard(t *testing.T) {
+	t.Run("Returns expected leaderboard", func(t *testing.T) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+		defer ts.Close()
 
-// 		emojivotoService.VoteWave(ctx, voteRequest)
-// 		emojivotoService.VoteWave(ctx, voteRequest)
-// 		emojivotoService.VoteGhost(ctx, voteRequest)
+		ctx := context.Background()
+		poll := voting.NewPoll()
+		emojivotoService := PollServiceServer{
+			emojisvcHostHTTP1: ts.URL,
+			poll:              poll,
+		}
 
-// 		response, err := emojivotoService.Results(context.Background(), &pb.ResultsRequest{})
+		votedForTwice := ":wave:"
+		votedForOnce := ":ghost:"
+		voteRequest := &pb.VoteRequest{}
 
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
+		emojivotoService.VoteWave(ctx, voteRequest)
+		emojivotoService.VoteWave(ctx, voteRequest)
+		emojivotoService.VoteGhost(ctx, voteRequest)
 
-// 		if len(response.Results) != 2 {
-// 			t.Fatalf("Expected results to contain two emoji, found: [%v]", response.Results)
-// 		}
+		response, err := emojivotoService.Results(context.Background(), &pb.ResultsRequest{})
 
-// 		if response.Results[0].Shortcode != votedForTwice || response.Results[0].Votes != 2 {
-// 			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForTwice, 2, response.Results)
-// 		}
+		if err != nil {
+			t.Fatal(err)
+		}
 
-// 		if response.Results[1].Shortcode != votedForOnce || response.Results[1].Votes != 1 {
-// 			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForOnce, 1, response.Results)
-// 		}
-// 	})
-// }
+		if len(response.Results) != 2 {
+			t.Fatalf("Expected results to contain two emoji, found: [%v]", response.Results)
+		}
 
-//TODO: test for errors
+		if response.Results[0].Shortcode != votedForTwice || response.Results[0].Votes != 2 {
+			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForTwice, 2, response.Results)
+		}
+
+		if response.Results[1].Shortcode != votedForOnce || response.Results[1].Votes != 1 {
+			t.Fatalf("Expected results to be [%v,%v], found: [%v]", votedForOnce, 1, response.Results)
+		}
+	})
+}
+
+// TODO: test for errors
