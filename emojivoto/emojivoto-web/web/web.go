@@ -2,7 +2,6 @@ package web
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -80,38 +79,37 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *WebApp) validateShortCode(shortcode string) error {
+	url := app.emojisvcHostHTTP1 + "/find-by-shortcode2/" + shortcode
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("request to emoji service [%s] failed: %s", url, err)
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("emoji service returned error: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	emojiShortcode := r.FormValue("choice")
 	if emojiShortcode == "" {
-		error := errors.New(fmt.Sprintf("Emoji choice [%s] is mandatory", emojiShortcode))
-		writeError(error, w, r, http.StatusBadRequest)
+		writeError(
+			fmt.Errorf("Emoji choice [%s] is mandatory", emojiShortcode),
+			w, r, http.StatusBadRequest,
+		)
 		return
 	}
 
-	client := &http.Client{}
-	resp, err := client.Get(app.emojisvcHostHTTP1 + "/FindByShortcodeNew/" + emojiShortcode)
+	err := app.validateShortCode(emojiShortcode)
 	if err != nil {
-		writeError(err, w, r, http.StatusBadRequest)
-		return
-	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		writeError(err, w, r, http.StatusBadRequest)
-		return
-	}
-
-	var selectedEmoji map[string]string
-	err = json.Unmarshal(bodyBytes, &selectedEmoji)
-	if err != nil {
-		writeError(err, w, r, http.StatusBadRequest)
-		return
-	}
-
-	defer resp.Body.Close()
-
-	if selectedEmoji == nil {
-		err = errors.New(fmt.Sprintf("Choosen emoji shortcode [%s] doesnt exist", emojiShortcode))
-		writeError(err, w, r, http.StatusBadRequest)
+		writeError(
+			fmt.Errorf("Failed to validate shortcode: [%s]", err),
+			w, r, http.StatusBadRequest,
+		)
 		return
 	}
 

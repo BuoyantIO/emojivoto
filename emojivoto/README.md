@@ -11,7 +11,7 @@ The application is composed of the following 3 services:
 
 ## Running
 
-### In Minikube
+### In Kubernetes
 
 Deploy the application to Minikube using the Conduit service mesh.
 
@@ -41,8 +41,17 @@ conduit inject emojivoto.yml | kubectl apply -f -
 
 5. Use the app!
 
+#### Minikube
+
 ```
 minikube -n emojivoto service web-svc
+```
+
+#### GKE / Docker For Mac
+
+```
+kubectl -n emojivoto port-forward $(kubectl -n emojivoto get po --selector=app=web-svc -o jsonpath='{.items[*].metadata.name}') 8080:80
+open http://localhost:8080
 ```
 
 ### In docker-compose
