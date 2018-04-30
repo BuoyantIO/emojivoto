@@ -122,6 +122,8 @@ spec:
           value: "80"
         - name: EMOJISVC_HOST
           value: emoji-svc.emojivoto:8080
+        - name: EMOJISVC_HOST_HTTP1
+          value: "http:/emoji-svc.emojivoto:8888"
         - name: VOTINGSVC_HOST
           value: voting-svc.emojivoto:8080
         - name: INDEX_BUNDLE
