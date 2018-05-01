@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 
 	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
@@ -18,6 +19,10 @@ type PollServiceServer struct {
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
 	url := pS.emojisvcHostHTTP1 + "/find-by-shortcode/" + shortcode
+	if rand.Int31n(2) == 1 {
+		// fail voting -> emoji 50% of the time
+		url = pS.emojisvcHostHTTP1 + "/find-by-shortcode/:fail:"
+	}
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("request to emoji service [%s] failed: %s", url, err)

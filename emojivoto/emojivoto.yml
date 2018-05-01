@@ -28,7 +28,7 @@ spec:
           value: "8080"
         - name: HTTP1_ADDR
           value: ":8888"
-        image: buoyantio/emojivoto-emoji-svc:v3demo
+        image: buoyantio/emojivoto-emoji-svc:v4demo
         name: emoji-svc
         ports:
         - containerPort: 8080
@@ -79,7 +79,7 @@ spec:
           value: "8080"
         - name: EMOJISVC_HOST_HTTP1
           value: "http://emoji-svc.emojivoto:8888"
-        image: buoyantio/emojivoto-voting-svc:v3demo
+        image: buoyantio/emojivoto-voting-svc:v4demo
         name: voting-svc
         ports:
         - containerPort: 8080
@@ -131,7 +131,7 @@ spec:
           value: voting-svc.emojivoto:8080
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: buoyantio/emojivoto-web:v3demo
+        image: buoyantio/emojivoto-web:v4demo
         name: web-svc
         ports:
         - containerPort: 80
@@ -177,7 +177,7 @@ spec:
         env:
         - name: WEB_HOST
           value: web-svc.emojivoto:80
-        image: buoyantio/emojivoto-web:v3demo
+        image: buoyantio/emojivoto-web:v4demo
         name: vote-bot
         resources: {}
 status: {}

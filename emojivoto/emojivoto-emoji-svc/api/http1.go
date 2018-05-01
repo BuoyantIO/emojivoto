@@ -10,8 +10,7 @@ import (
 )
 
 type EmojiH1Server struct {
-	oldEmoji emoji.AllEmoji
-	newEmoji emoji.AllEmoji
+	allEmoji emoji.AllEmoji
 }
 
 func findByShortcode(allEmoji emoji.AllEmoji, w http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -29,15 +28,22 @@ func findByShortcode(allEmoji emoji.AllEmoji, w http.ResponseWriter, req *http.R
 	}
 }
 
-func (s *EmojiH1Server) FindByShortcode2(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	findByShortcode(s.newEmoji, w, req, params)
-}
-
 func (s *EmojiH1Server) FindByShortcode(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	findByShortcode(s.oldEmoji, w, req, params)
+	foundEmoji := s.allEmoji.WithShortcode(params.ByName("shortcode"))
+	if foundEmoji != nil {
+		selectedEmoji := map[string]string{
+			foundEmoji.Shortcode: foundEmoji.Unicode,
+		}
+		err := json.NewEncoder(w).Encode(selectedEmoji)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+	} else {
+		http.Error(w, "emoji not found", 500)
+	}
 }
 
-func NewHTTP1Server(HTTP1Addr string, oldEmoji emoji.AllEmoji, newEmoji emoji.AllEmoji) *EmojiH1Server {
+func NewHTTP1Server(HTTP1Addr string, allEmoji emoji.AllEmoji) *EmojiH1Server {
 	router := httprouter.New()
 	HTTP1Server := http.Server{
 		Addr:         HTTP1Addr,
@@ -47,11 +53,9 @@ func NewHTTP1Server(HTTP1Addr string, oldEmoji emoji.AllEmoji, newEmoji emoji.Al
 	}
 
 	server := &EmojiH1Server{
-		oldEmoji: oldEmoji,
-		newEmoji: newEmoji,
+		allEmoji: allEmoji,
 	}
 
-	router.GET("/find-by-shortcode2/:shortcode", server.FindByShortcode2)
 	router.GET("/find-by-shortcode/:shortcode", server.FindByShortcode)
 
 	err := HTTP1Server.ListenAndServe()

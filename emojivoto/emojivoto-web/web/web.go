@@ -80,7 +80,7 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *WebApp) validateShortCode(shortcode string) error {
-	url := app.emojisvcHostHTTP1 + "/find-by-shortcode2/" + shortcode
+	url := app.emojisvcHostHTTP1 + "/find-by-shortcode/" + shortcode
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("request to emoji service [%s] failed: %s", url, err)

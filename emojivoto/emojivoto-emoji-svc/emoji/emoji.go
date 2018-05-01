@@ -119,60 +119,6 @@ var top100Emoji = []string{
 	":floppy_disk:",
 }
 
-var top50Emoji = []string{
-	":joy:",
-	":sunglasses:",
-	":relaxed:",
-	":stuck_out_tongue_winking_eye:",
-	":money_mouth_face:",
-	":flushed:",
-	":mask:",
-	":nerd_face:",
-	":ghost:",
-	":skull_and_crossbones:",
-	":heart_eyes_cat:",
-	":hear_no_evil:",
-	":see_no_evil:",
-	":speak_no_evil:",
-	":boy:",
-	":girl:",
-	":man:",
-	":woman:",
-	":older_man:",
-	":policeman:",
-	":guardsman:",
-	":construction_worker_man:",
-	":prince:",
-	":princess:",
-	":man_in_tuxedo:",
-	":bride_with_veil:",
-	":mrs_claus:",
-	":santa:",
-	":turkey:",
-	":rabbit:",
-	":no_good_woman:",
-	":ok_woman:",
-	":raising_hand_woman:",
-	":bowing_man:",
-	":man_facepalming:",
-	":woman_shrugging:",
-	":massage_woman:",
-	":walking_man:",
-	":running_man:",
-	":dancer:",
-	":man_dancing:",
-	":dancing_women:",
-	":rainbow:",
-	":skier:",
-	":golfing_man:",
-	":surfing_man:",
-	":basketball_man:",
-	":biking_man:",
-	":point_up_2:",
-	":vulcan_salute:",
-	":poop:",
-}
-
 func (allEmoji *inMemoryAllEmoji) List() []*Emoji {
 	return allEmoji.emojiList
 }
@@ -190,22 +136,6 @@ func NewAllEmoji() AllEmoji {
 	emojiList := make([]*Emoji, 0)
 
 	for _, name := range top100Emoji {
-		e := &Emoji{
-			Unicode:   emojiCodeMap[name],
-			Shortcode: name,
-		}
-		emojiList = append(emojiList, e)
-	}
-
-	return &inMemoryAllEmoji{
-		emojiList,
-	}
-}
-
-func OldAllEmoji() AllEmoji {
-	emojiList := make([]*Emoji, 0)
-
-	for _, name := range top50Emoji {
 		e := &Emoji{
 			Unicode:   emojiCodeMap[name],
 			Shortcode: name,

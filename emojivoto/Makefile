@@ -3,7 +3,7 @@
 all: build integration-tests
 
 build-base-docker-image:
-	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:v3demo"
+	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:v4demo"
 
 web:
 	$(MAKE) -C emojivoto-web

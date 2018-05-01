@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: buoyantio/emojivoto-web:v3demo
+    image: buoyantio/emojivoto-web:v4demo
     environment:
       - WEB_PORT=8080
       - EMOJISVC_HOST=emoji-svc:8080
@@ -16,7 +16,7 @@ services:
       - emoji-svc
 
   vote-bot:
-    image: buoyantio/emojivoto-web:v3demo
+    image: buoyantio/emojivoto-web:v4demo
     entrypoint: emojivoto-vote-bot
     environment:
       - WEB_HOST=web:8080
@@ -24,7 +24,7 @@ services:
       - web
 
   emoji-svc:
-    image: buoyantio/emojivoto-emoji-svc:v3demo
+    image: buoyantio/emojivoto-emoji-svc:v4demo
     environment:
       - GRPC_PORT=8080
       - HTTP1_ADDR=:8888
@@ -33,7 +33,7 @@ services:
       - "8888:8888"
 
   voting-svc:
-    image: buoyantio/emojivoto-voting-svc:v3demo
+    image: buoyantio/emojivoto-voting-svc:v4demo
     environment:
       - GRPC_PORT=8080
       - EMOJISVC_HOST_HTTP1=http://emoji-svc:8888
