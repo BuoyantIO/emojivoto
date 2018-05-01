@@ -51,6 +51,9 @@ spec:
   - name: grpc
     port: 8080
     targetPort: 8080
+  - name: http
+    port: 8888
+    targetPort: 8888
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
