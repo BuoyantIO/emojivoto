@@ -1,0 +1,148 @@
+#
+# Conduit lifecycle test configuration
+#
+# slow_cooker ->
+#   HTTP 1.1 ->
+#     bb point-to-point ->
+#       gRPC ->
+#         bb terminus
+#
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: lifecycle
+
+#
+# slow_cooker
+#
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: slow-cooker
+  namespace: lifecycle
+spec:
+  template:
+    metadata:
+      name: slow-cooker
+    spec:
+      containers:
+      - image: buoyantio/slow_cooker:1.1.0
+        imagePullPolicy: IfNotPresent
+        name: slow-cooker
+        command:
+        - "/bin/bash"
+        args:
+        - "-c"
+        - |
+          sleep 30 # wait for pods to start
+          slow_cooker \
+            -qps 10 \
+            -concurrency 10 \
+            -interval 30s \
+            -metric-addr 0.0.0.0:9990 \
+            http://bb-p2p.lifecycle.svc.cluster.local:8080
+        ports:
+        - name: slow-cooker
+          containerPort: 9990
+      restartPolicy: OnFailure
+---
+
+#
+# bb point-to-point
+#
+kind: Service
+apiVersion: v1
+metadata:
+  name: bb-p2p
+  namespace: lifecycle
+spec:
+  clusterIP: None
+  selector:
+    app: bb-p2p
+  ports:
+  - name: bb-p2p-http1
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: bb-p2p
+  name: bb-p2p
+  namespace: lifecycle
+spec:
+  replicas: 10
+  template:
+    metadata:
+      labels:
+        app: bb-p2p
+    spec:
+      containers:
+      - image: buoyantio/bb:v0.0.3
+        imagePullPolicy: IfNotPresent
+        name: bb-p2p
+        command:
+        - "/bin/bash"
+        args:
+        - "-c"
+        - |
+          exec \
+          /out/bb point-to-point-channel \
+          --grpc-downstream-server=bb-terminus.lifecycle.svc.cluster.local:9090 \
+          --h1-server-port=8080
+        ports:
+        - containerPort: 8080
+          name: bb-p2p-http1
+---
+
+#
+# bb terminus
+#
+kind: Service
+apiVersion: v1
+metadata:
+  name: bb-terminus
+  namespace: lifecycle
+spec:
+  clusterIP: None
+  selector:
+    app: bb-terminus
+  ports:
+  - name: bb-term-grpc
+    port: 9090
+    targetPort: 9090
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: bb-terminus
+  name: bb-terminus
+  namespace: lifecycle
+spec:
+  replicas: 10
+  template:
+    metadata:
+      labels:
+        app: bb-terminus
+    spec:
+      containers:
+      - image: buoyantio/bb:v0.0.3
+        imagePullPolicy: IfNotPresent
+        name: bb-terminus
+        command:
+        - "/bin/bash"
+        args:
+        - "-c"
+        - |
+          exec \
+          /out/bb terminus \
+          --grpc-server-port=9090 \
+          --response-text=BANANA \
+          --terminate-after=$(shuf -i 550-650 -n1) # 10 qps * 10 concurrency * 60 seconds / 10 replicas == 600
+        ports:
+        - containerPort: 9090
+          name: bb-term-grpc
