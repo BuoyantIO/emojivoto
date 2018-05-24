@@ -10,19 +10,29 @@ of time in a dynamically-scheduled environment in order to exercise:
 - Service discovery lifecycle (i.e. updates are honored correctly, doesn't get
   out sync).
 
+## First time setup
+
+[`lifecycle.yml`](lifecycle.yml) creates a `ClusterRole`, which requires your user to have this
+ability.
+
+```bash
+kubectl create clusterrolebinding cluster-admin-binding-$USER \
+  --clusterrole=cluster-admin --user=$(gcloud config get-value account)
+```
+
 ## Deploy
 
 Install Conduit service mesh:
 
 ```bash
-conduit install | kubectl apply -f -
-conduit dashboard
+conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
+conduit dashboard --conduit-namespace conduit-lifecycle
 ```
 
 Deploy test framework to `lifecycle` namespace:
 
 ```bash
-cat lifecycle.yml | conduit inject - | kubectl apply -f -
+cat lifecycle.yml | conduit inject --conduit-namespace conduit-lifecycle - | kubectl apply -f -
 ```
 
 ## Observe
@@ -30,7 +40,7 @@ cat lifecycle.yml | conduit inject - | kubectl apply -f -
 Browse to Grafana:
 
 ```bash
-conduit dashboard --show grafana
+conduit dashboard --conduit-namespace conduit-lifecycle --show grafana
 ```
 
 Tail slow-cooker logs:
@@ -50,4 +60,5 @@ Relevant Grafana dashboards to observe
 
 ```bash
 kubectl delete ns lifecycle
+kubectl delete ns conduit-lifecycle
 ```

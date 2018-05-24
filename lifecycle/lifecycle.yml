@@ -141,8 +141,100 @@ spec:
           exec \
           /out/bb terminus \
           --grpc-server-port=9090 \
-          --response-text=BANANA \
-          --terminate-after=$(shuf -i 550-650 -n1) # 10 qps * 10 concurrency * 60 seconds / 10 replicas == 600
+          --response-text=BANANA
+          #--terminate-after=$(shuf -i 550-650 -n1) # 10 qps * 10 concurrency * 60 seconds / 10 replicas == 600
         ports:
         - containerPort: 9090
           name: bb-term-grpc
+---
+
+#
+# Redeploy via kubectl
+#
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: redeployer
+  namespace: lifecycle
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: lifecycle:redeployer
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["delete", "get", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: lifecycle:redeployer
+  namespace: lifecycle
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: lifecycle:redeployer
+subjects:
+- kind: ServiceAccount
+  name: redeployer
+  namespace: lifecycle
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redeployer
+  namespace: lifecycle
+data:
+  redeployer: |-
+    #!/bin/sh
+
+    # give deployment time to fully roll out
+    sleep 60
+
+    while true; do
+      PODS=$(kubectl -n lifecycle get po --selector=app=bb-terminus -o jsonpath='{.items[*].metadata.name}')
+
+      SPACES=$(echo "${PODS}" | awk -F" " '{print NF-1}')
+      POD_COUNT=$(($SPACES+1))
+      echo "found ${POD_COUNT} pods"
+
+      # restart each pod every minute
+      SLEEP_TIME=$(( 60 / $POD_COUNT))
+
+      for POD in ${PODS}; do
+        kubectl -n lifecycle delete po $POD
+        echo "sleeping for ${SLEEP_TIME} seconds..."
+        sleep $SLEEP_TIME
+      done
+    done
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: redeployer
+  name: redeployer
+  namespace: lifecycle
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redeployer
+    spec:
+      serviceAccount: redeployer
+      containers:
+      - image: lachlanevenson/k8s-kubectl:v1.10.3
+        imagePullPolicy: IfNotPresent
+        name: redeployer
+        command:
+        - "/data/redeployer"
+        volumeMounts:
+        - name: redeployer
+          mountPath: /data
+      volumes:
+      - name: redeployer
+        configMap:
+          name: redeployer
+          defaultMode: 0744
