@@ -8,24 +8,22 @@
 #         bb terminus
 #
 
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: lifecycle
-
 #
 # slow_cooker
 #
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
+  labels:
+    app: slow-cooker
   name: slow-cooker
-  namespace: lifecycle
 spec:
+  replicas: 1
   template:
     metadata:
-      name: slow-cooker
+      labels:
+        app: slow-cooker
     spec:
       containers:
       - image: buoyantio/slow_cooker:1.1.0
@@ -42,11 +40,10 @@ spec:
             -concurrency 10 \
             -interval 30s \
             -metric-addr 0.0.0.0:9990 \
-            http://bb-p2p.lifecycle.svc.cluster.local:8080
+            http://bb-p2p:8080
         ports:
         - name: slow-cooker
           containerPort: 9990
-      restartPolicy: OnFailure
 ---
 
 #
@@ -56,7 +53,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: bb-p2p
-  namespace: lifecycle
 spec:
   clusterIP: None
   selector:
@@ -72,9 +68,8 @@ metadata:
   labels:
     app: bb-p2p
   name: bb-p2p
-  namespace: lifecycle
 spec:
-  replicas: 10
+  replicas: 1
   template:
     metadata:
       labels:
@@ -91,7 +86,7 @@ spec:
         - |
           exec \
           /out/bb point-to-point-channel \
-          --grpc-downstream-server=bb-terminus.lifecycle.svc.cluster.local:9090 \
+          --grpc-downstream-server=bb-terminus:9090 \
           --h1-server-port=8080
         ports:
         - containerPort: 8080
@@ -105,7 +100,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: bb-terminus
-  namespace: lifecycle
 spec:
   clusterIP: None
   selector:
@@ -121,9 +115,8 @@ metadata:
   labels:
     app: bb-terminus
   name: bb-terminus
-  namespace: lifecycle
 spec:
-  replicas: 10
+  replicas: 1
   template:
     metadata:
       labels:
@@ -155,9 +148,8 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: redeployer
-  namespace: lifecycle
 ---
-kind: ClusterRole
+kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: lifecycle:redeployer
@@ -166,25 +158,22 @@ rules:
   resources: ["pods"]
   verbs: ["delete", "get", "list"]
 ---
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: lifecycle:redeployer
-  namespace: lifecycle
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: lifecycle:redeployer
 subjects:
 - kind: ServiceAccount
   name: redeployer
-  namespace: lifecycle
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redeployer
-  namespace: lifecycle
 data:
   redeployer: |-
     #!/bin/sh
@@ -193,7 +182,7 @@ data:
     sleep 60
 
     while true; do
-      PODS=$(kubectl -n lifecycle get po --selector=app=bb-terminus -o jsonpath='{.items[*].metadata.name}')
+      PODS=$(kubectl -n $LIFECYCLE_NS get po --selector=app=bb-terminus -o jsonpath='{.items[*].metadata.name}')
 
       SPACES=$(echo "${PODS}" | awk -F" " '{print NF-1}')
       POD_COUNT=$(($SPACES+1))
@@ -201,9 +190,15 @@ data:
 
       # restart each pod every minute
       SLEEP_TIME=$(( 60 / $POD_COUNT))
+      if [ $SLEEP_TIME = 0 ]; then
+        SLEEP_TIME=1
+      fi
+
+      # TODO: consider overriding the calculation above, to better accomodate large deployments
+      # SLEEP_TIME=30
 
       for POD in ${PODS}; do
-        kubectl -n lifecycle delete po $POD
+        kubectl -n $LIFECYCLE_NS delete po $POD
         echo "sleeping for ${SLEEP_TIME} seconds..."
         sleep $SLEEP_TIME
       done
@@ -215,7 +210,6 @@ metadata:
   labels:
     app: redeployer
   name: redeployer
-  namespace: lifecycle
 spec:
   replicas: 1
   template:
@@ -230,6 +224,11 @@ spec:
         name: redeployer
         command:
         - "/data/redeployer"
+        env:
+        - name: LIFECYCLE_NS
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         volumeMounts:
         - name: redeployer
           mountPath: /data

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+NAMESPACES=${1:-1}
+
+echo "Tearing down $NAMESPACES namespaces...\n"
+
+for i in `seq 1 $NAMESPACES`;
+do
+  kubectl delete ns lifecycle$i || true
+done
