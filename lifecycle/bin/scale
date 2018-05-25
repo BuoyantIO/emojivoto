@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+NAMESPACES=${1:-1}
+REPLICAS=${2:-1}
+
+if [ "$NAMESPACES" -gt 100 ]; then
+  echo "Don't deploy more than 100 namespaces"
+  exit 1
+fi
+
+if [ "$REPLICAS" -gt 100 ]; then
+  echo "Don't scale more than 100 replicas"
+  exit 1
+fi
+
+echo "Scaling $NAMESPACES namespaces to $REPLICAS replicas..."
+
+for i in `seq 1 $NAMESPACES`;
+do
+  NS=lifecycle$i
+
+  echo "\nScaling $NS to $REPLICAS replicas..."
+  kubectl -n lifecycle$i scale --replicas=$REPLICAS deploy/bb-p2p deploy/bb-terminus
+done

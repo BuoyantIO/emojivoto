@@ -12,8 +12,8 @@ of time in a dynamically-scheduled environment in order to exercise:
 
 ## First time setup
 
-[`lifecycle.yml`](lifecycle.yml) creates a `ClusterRole`, which requires your user to have this
-ability.
+[`lifecycle.yml`](lifecycle.yml) creates a `ClusterRole`, which requires your
+user to have this ability.
 
 ```bash
 kubectl create clusterrolebinding cluster-admin-binding-$USER \
@@ -32,7 +32,15 @@ conduit dashboard --conduit-namespace conduit-lifecycle
 Deploy test framework to `lifecycle` namespace:
 
 ```bash
-cat lifecycle.yml | conduit inject --conduit-namespace conduit-lifecycle - | kubectl apply -f -
+export LIFECYCLE_NS=lifecycle
+kubectl create ns $LIFECYCLE_NS
+cat lifecycle.yml | conduit inject --conduit-namespace conduit-lifecycle - | kubectl -n $LIFECYCLE_NS apply -f -
+```
+
+Scale `bb-p2p` and `bb-terminus`:
+
+```bash
+kubectl -n $LIFECYCLE_NS scale --replicas=3 deploy/bb-p2p deploy/bb-terminus
 ```
 
 ## Observe
@@ -46,8 +54,8 @@ conduit dashboard --conduit-namespace conduit-lifecycle --show grafana
 Tail slow-cooker logs:
 
 ```bash
-kubectl -n lifecycle logs -f $(
-  kubectl -n lifecycle get po --selector=job-name=slow-cooker -o jsonpath='{.items[*].metadata.name}'
+kubectl -n $LIFECYCLE_NS logs -f $(
+  kubectl -n $LIFECYCLE_NS get po --selector=app=slow-cooker -o jsonpath='{.items[*].metadata.name}'
 ) slow-cooker
 ```
 
@@ -55,10 +63,30 @@ Relevant Grafana dashboards to observe
 - `Conduit Deployment`, for route lifecycle and service discovery lifecycle
 - `Prometheus 2.0 Stats`, for telemetry resource lifecycle
 
-
 ## Teardown
 
 ```bash
-kubectl delete ns lifecycle
+kubectl delete ns $LIFECYCLE_NS
 kubectl delete ns conduit-lifecycle
+```
+
+## Batch Deploy / Scale / Teardown
+
+Deploy 10 lifecycle namespaces:
+
+```bash
+conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
+bin/deploy 10
+```
+
+Scale 10 lifecycle namespaces to 3 replicas of `bb-p2p` and `bb-terminus` each:
+
+```bash
+bin/scale 10 3
+```
+
+Teardown 10 lifecycle namespaces:
+
+```bash
+bin/teardown 10
 ```
