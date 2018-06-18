@@ -20,7 +20,30 @@ kubectl create clusterrolebinding cluster-admin-binding-$USER \
   --clusterrole=cluster-admin --user=$(gcloud config get-value account)
 ```
 
-## Deploy
+## Batch Deploy / Scale / Teardown
+
+Deploy 10 lifecycle namespaces:
+
+```bash
+conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
+bin/deploy 10
+```
+
+Scale 10 lifecycle namespaces to 3 replicas of `bb-p2p` and `bb-terminus` each:
+
+```bash
+bin/scale 10 3
+```
+
+Teardown 10 lifecycle namespaces:
+
+```bash
+bin/teardown 10
+```
+
+## Individual Deploy / Scale / Teardown
+
+### Deploy
 
 Install Conduit service mesh:
 
@@ -43,7 +66,7 @@ Scale `bb-p2p` and `bb-terminus`:
 kubectl -n $LIFECYCLE_NS scale --replicas=3 deploy/bb-p2p deploy/bb-terminus
 ```
 
-## Observe
+### Observe
 
 Browse to Grafana:
 
@@ -63,30 +86,9 @@ Relevant Grafana dashboards to observe
 - `Conduit Deployment`, for route lifecycle and service discovery lifecycle
 - `Prometheus 2.0 Stats`, for telemetry resource lifecycle
 
-## Teardown
+### Teardown
 
 ```bash
 kubectl delete ns $LIFECYCLE_NS
 kubectl delete ns conduit-lifecycle
-```
-
-## Batch Deploy / Scale / Teardown
-
-Deploy 10 lifecycle namespaces:
-
-```bash
-conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
-bin/deploy 10
-```
-
-Scale 10 lifecycle namespaces to 3 replicas of `bb-p2p` and `bb-terminus` each:
-
-```bash
-bin/scale 10 3
-```
-
-Teardown 10 lifecycle namespaces:
-
-```bash
-bin/teardown 10
 ```

@@ -188,14 +188,14 @@ data:
       POD_COUNT=$(($SPACES+1))
       echo "found ${POD_COUNT} pods"
 
-      # restart each pod every minute
-      SLEEP_TIME=$(( 60 / $POD_COUNT))
-      if [ $SLEEP_TIME = 0 ]; then
-        SLEEP_TIME=1
-      fi
+      SLEEP_TIME=60
 
-      # TODO: consider overriding the calculation above, to better accomodate large deployments
-      # SLEEP_TIME=30
+      # more aggressive restart interval, for smaller deployments
+      # restart each pod every minute
+      # SLEEP_TIME=$(( 60 / $POD_COUNT))
+      # if [ $SLEEP_TIME = 0 ]; then
+      #   SLEEP_TIME=1
+      # fi
 
       for POD in ${PODS}; do
         kubectl -n $LIFECYCLE_NS delete po $POD
