@@ -182,11 +182,11 @@ data:
     sleep 60
 
     while true; do
-      PODS=$(kubectl -n $LIFECYCLE_NS get po --selector=app=bb-terminus -o jsonpath='{.items[*].metadata.name}')
+      PODS=$(kubectl -n $LIFECYCLE_NS get po --field-selector=status.phase=Running --selector=app=bb-terminus -o jsonpath='{.items[*].metadata.name}')
 
       SPACES=$(echo "${PODS}" | awk -F" " '{print NF-1}')
       POD_COUNT=$(($SPACES+1))
-      echo "found ${POD_COUNT} pods"
+      echo "found ${POD_COUNT} running pods"
 
       SLEEP_TIME=60
 
@@ -202,6 +202,11 @@ data:
         echo "sleeping for ${SLEEP_TIME} seconds..."
         sleep $SLEEP_TIME
       done
+
+      # bounce service
+      svc=$(kubectl -n $LIFECYCLE_NS get svc/bb-terminus -o json)
+      kubectl -n $LIFECYCLE_NS delete svc/bb-terminus
+      echo $svc | kubectl -n $LIFECYCLE_NS apply -f -
     done
 ---
 apiVersion: extensions/v1beta1
