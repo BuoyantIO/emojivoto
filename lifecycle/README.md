@@ -22,23 +22,26 @@ kubectl create clusterrolebinding cluster-admin-binding-$USER \
 
 ## Batch Deploy / Scale / Teardown
 
-Deploy 10 lifecycle namespaces:
+Deploy 5 lifecycle namespaces:
 
 ```bash
 conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
-bin/deploy 10
+bin/deploy 5
 ```
 
-Scale 10 lifecycle namespaces to 3 replicas of `bb-p2p` and `bb-terminus` each:
+Scale 5 lifecycle namespaces to 3 replicas of `bb-broadcast`, `bb-p2p`, and
+`bb-terminus` each:
 
 ```bash
-bin/scale 10 3
+bin/scale 5 3
 ```
 
-Teardown 10 lifecycle namespaces:
+Total mesh-enabled pod count == namespaces * (3*replicas+2)
+
+Teardown 5 lifecycle namespaces:
 
 ```bash
-bin/teardown 10
+bin/teardown 5
 ```
 
 ## Individual Deploy / Scale / Teardown
@@ -60,7 +63,7 @@ kubectl create ns $LIFECYCLE_NS
 cat lifecycle.yml | conduit inject --conduit-namespace conduit-lifecycle - | kubectl -n $LIFECYCLE_NS apply -f -
 ```
 
-Scale `bb-p2p` and `bb-terminus`:
+Scale `bb-broadcast`, `bb-p2p`, and `bb-terminus`:
 
 ```bash
 kubectl -n $LIFECYCLE_NS scale --replicas=3 deploy/bb-p2p deploy/bb-terminus
