@@ -22,5 +22,5 @@ do
   NS=lifecycle$i
 
   echo "\nScaling $NS to $REPLICAS replicas..."
-  kubectl -n lifecycle$i scale --replicas=$REPLICAS deploy/bb-p2p deploy/bb-terminus
+  kubectl -n lifecycle$i scale --replicas=$REPLICAS deploy/bb-broadcast deploy/bb-p2p deploy/bb-terminus
 done
