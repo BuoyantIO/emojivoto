@@ -297,7 +297,7 @@ spec:
           exec \
           /out/bb terminus \
           --grpc-server-port=9090 \
-          --response-text=BANANA
+          --response-text=BANANA0
         ports:
         - containerPort: 9090
           name: bb-term-grpc
@@ -316,6 +316,9 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: lifecycle:redeployer
 rules:
+- apiGroups: ["extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "patch"]
 - apiGroups: [""]
   resources: ["pods", "services"]
   verbs: ["create", "delete", "get", "list"]
@@ -366,9 +369,9 @@ data:
         if [ $(( NOW - LAST )) -gt 30 ]; then
           echo "bouncing services..."
           for i in `seq 1 10`; do
-            svc=$(kubectl -n $LIFECYCLE_NS get svc/bb-terminus$i -o json)
+            SVC=$(kubectl -n $LIFECYCLE_NS get svc/bb-terminus$i -o json)
             kubectl -n $LIFECYCLE_NS delete svc/bb-terminus$i
-            echo $svc | kubectl -n $LIFECYCLE_NS apply -f -
+            echo $SVC | kubectl -n $LIFECYCLE_NS apply -f -
           done
           LAST=NOW
         fi
@@ -376,6 +379,15 @@ data:
         echo "sleeping for ${SLEEP_TIME} seconds..."
         sleep $SLEEP_TIME
       done
+
+      # redeploy the whole bb-terminus deployment
+      echo "redeploying bb-terminus deployment"
+      DEPLOY=$(kubectl -n $LIFECYCLE_NS get deploy/bb-terminus -o json)
+      echo $DEPLOY | sed -E 's/BANANA[0-9]+/BANANA'$(date +'%s')'/g' | kubectl -n $LIFECYCLE_NS apply -f -
+
+      # give the new deployment time to roll out, before we start deleting pods again
+      echo "sleeping for 60 seconds..."
+      sleep 60
     done
 ---
 apiVersion: extensions/v1beta1

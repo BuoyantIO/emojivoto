@@ -25,7 +25,7 @@ kubectl create clusterrolebinding cluster-admin-binding-$USER \
 Deploy 5 lifecycle namespaces:
 
 ```bash
-conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
+conduit install --conduit-namespace conduit-lifecycle --tls optional | kubectl apply -f -
 bin/deploy 5
 ```
 

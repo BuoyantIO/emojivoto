@@ -18,6 +18,6 @@ do
   echo "\nDeploying $NS..."
   kubectl create ns $NS
   cat lifecycle.yml |
-    conduit inject --conduit-namespace conduit-lifecycle - |
+    conduit inject --conduit-namespace conduit-lifecycle --tls optional - |
     kubectl -n $NS apply -f -
 done
