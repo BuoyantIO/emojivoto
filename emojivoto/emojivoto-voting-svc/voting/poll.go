@@ -26,12 +26,12 @@ type Poll interface {
 
 type inMemoryPoll struct {
 	votes map[string]int
-	mutex sync.RWMutex
+	sync.RWMutex
 }
 
 func (p *inMemoryPoll) Vote(choice string) error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+	p.Lock()
+	defer p.Unlock()
 
 	if p.votes[choice] > 0 {
 		p.votes[choice] = p.votes[choice] + 1
@@ -43,8 +43,8 @@ func (p *inMemoryPoll) Vote(choice string) error {
 }
 
 func (p *inMemoryPoll) Results() ([]*Result, error) {
-	p.mutex.RLock()
-	defer p.mutex.RUnlock()
+	p.RLock()
+	defer p.RUnlock()
 
 	results := make([]*Result, 0)
 
@@ -60,6 +60,5 @@ func (p *inMemoryPoll) Results() ([]*Result, error) {
 func NewPoll() Poll {
 	return &inMemoryPoll{
 		votes: make(map[string]int, 0),
-		mutex: sync.RWMutex{},
 	}
 }
