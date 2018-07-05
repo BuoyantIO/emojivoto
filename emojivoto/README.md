@@ -86,10 +86,10 @@ To update the docker images:
 5. Push the docker images to hub.docker.com
 ```bash
 docker login
-docker push buoyantio/emojivoto-svc-base:v3
-docker push buoyantio/emojivoto-emoji-svc:v3
-docker push buoyantio/emojivoto-voting-svc:v3
-docker push buoyantio/emojivoto-web:v3
+docker push buoyantio/emojivoto-svc-base:v4
+docker push buoyantio/emojivoto-emoji-svc:v4
+docker push buoyantio/emojivoto-voting-svc:v4
+docker push buoyantio/emojivoto-web:v4
 ```
 6. Update `emojivoto.yml`, `docker-compose.yml`
 

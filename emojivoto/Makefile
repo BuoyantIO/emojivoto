@@ -1,9 +1,11 @@
-.PHONY: web emoji-svc voting-svc integration-tests
+include ./common.mk
+
+.PHONY: web emoji-svc voting-svc integration-tests push
 
 all: build integration-tests
 
 build-base-docker-image:
-	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:v3"
+	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:$(IMAGE_TAG)"
 
 web:
 	$(MAKE) -C emojivoto-web
@@ -14,7 +16,6 @@ emoji-svc:
 voting-svc:
 	$(MAKE) -C emojivoto-voting-svc
 
-
 build: web emoji-svc voting-svc
 
 deploy-to-minikube:
@@ -23,7 +24,6 @@ deploy-to-minikube:
 	$(MAKE) -C emojivoto-voting-svc build-container
 	kubectl delete -f emojivoto.yml || echo "ok"
 	kubectl apply -f emojivoto.yml
-
 
 deploy-to-docker-compose:
 	docker-compose stop
@@ -37,3 +37,8 @@ integration-tests: deploy-to-docker-compose
 	WEB_URL=http://localhost:8080 $(MAKE) -C integration_test test
 	docker-compose stop
 	docker-compose rm -vf
+
+push-%:
+	docker push buoyantio/emojivoto-$*:$(IMAGE_TAG)
+
+push: push-svc-base push-emoji-svc push-voting-svc push-web
