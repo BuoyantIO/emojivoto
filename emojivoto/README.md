@@ -9,7 +9,7 @@ The application is composed of the following 3 services:
 * [emojivoto-emoji-svc](emojivoto-emoji-svc/): gRPC API for finding and listing emoji
 * [emojivoto-voting-svc](emojivoto-voting-svc/): gRPC API for voting and leaderboard
 
-![alt text](assets/emojivoto-topology.png "Emojivoto Topology")
+![Emojivoto Topology](assets/emojivoto-topology.png "Emojivoto Topology")
 
 ## Running
 
