@@ -8,7 +8,7 @@ import styles from './../css/styles.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 // TODO: use static assets
-// import logo from './../img/conduit-primary-white.svg';
+// import logo from './../img/linkerd-primary-white.svg';
 // <img src={logo}/>
 
 let appMain = document.getElementById('main');

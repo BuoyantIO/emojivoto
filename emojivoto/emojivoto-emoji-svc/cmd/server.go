@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net"
 	"google.golang.org/grpc"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/api"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
+	"github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-emoji-svc/api"
+	"github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-emoji-svc/emoji"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-web/gen/proto"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-web/web"
+	pb "github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-web/gen/proto"
+	"github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-web/web"
 	"google.golang.org/grpc"
 )
 

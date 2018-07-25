@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
-	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
+	"github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-emoji-svc/emoji"
+	pb "github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
 )
 
 func TestListAll(t *testing.T) {

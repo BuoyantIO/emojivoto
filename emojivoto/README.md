@@ -15,30 +15,30 @@ The application is composed of the following 3 services:
 
 ### In Minikube
 
-Deploy the application to Minikube using the Conduit service mesh.
+Deploy the application to Minikube using the Linkerd 2 service mesh.
 
-1. Install the Conduit CLI
-
-```
-curl https://run.conduit.io/install | sh
-```
-
-2. Install Conduit
+1. Install the Linkerd 2 CLI
 
 ```
-conduit install | kubectl apply -f -
+curl https://run.linkerd2.io/install | sh
+```
+
+2. Install Linkerd 2
+
+```
+linkerd install | kubectl apply -f -
 ```
 
 3. View the dashboard!
 
 ```
-conduit dashboard
+linkerd dashboard
 ```
 
 4. Inject, Deploy, and Enjoy
 
 ```
-conduit inject emojivoto.yml | kubectl apply -f -
+linkerd inject emojivoto.yml | kubectl apply -f -
 ```
 
 5. Use the app!
@@ -49,7 +49,7 @@ minikube -n emojivoto service web-svc
 
 ### In docker-compose
 
-It's also possible to run the app with docker-compose (without Conduit).
+It's also possible to run the app with docker-compose (without Linkerd 2).
 
 Build and run:
 
