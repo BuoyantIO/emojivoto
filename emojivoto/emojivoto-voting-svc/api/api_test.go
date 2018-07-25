@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/gen/proto"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
+	pb "github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-voting-svc/gen/proto"
+	"github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-voting-svc/voting"
 )
 
 func TestVoteJoy(t *testing.T) {

@@ -20,13 +20,13 @@ do
   echo "\nDeploying $NS..."
   kubectl create ns $NS
   cat lifecycle.yml |
-    conduit inject --conduit-namespace conduit-lifecycle - |
+    linkerd inject --linkerd-namespace linkerd-lifecycle - |
     kubectl -n $NS apply -f -
 
   echo "\nDeploying $NS_TLS..."
   kubectl create ns $NS_TLS
   cat lifecycle.yml |
-    conduit inject --conduit-namespace conduit-lifecycle-tls --tls optional - |
+    linkerd inject --linkerd-namespace linkerd-lifecycle-tls --tls optional - |
     kubectl -n $NS_TLS apply -f -
 
   echo "\nDeploying $NS_BASELINE..."

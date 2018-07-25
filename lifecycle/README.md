@@ -25,8 +25,8 @@ kubectl create clusterrolebinding cluster-admin-binding-$USER \
 Deploy 3 lifecycle environments:
 
 ```bash
-conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
-conduit install --conduit-namespace conduit-lifecycle-tls --tls optional | kubectl apply -f -
+linkerd install --linkerd-namespace linkerd-lifecycle | kubectl apply -f -
+linkerd install --linkerd-namespace linkerd-lifecycle-tls --tls optional | kubectl apply -f -
 bin/deploy 3
 ```
 
@@ -37,7 +37,7 @@ Scale 3 lifecycle environments to 3 replicas of `bb-broadcast`, `bb-p2p`, and
 bin/scale 3 3
 ```
 
-Total mesh-enabled pod count == (1 conduit ns + 1 conduit tls ns) * (3*replicas+2)
+Total mesh-enabled pod count == (1 linkerd ns + 1 linkerd tls ns) * (3*replicas+2)
 
 Teardown 3 lifecycle environments:
 
@@ -52,8 +52,8 @@ bin/teardown 3
 Install Conduit service mesh:
 
 ```bash
-conduit install --conduit-namespace conduit-lifecycle | kubectl apply -f -
-conduit dashboard --conduit-namespace conduit-lifecycle
+linkerd install --linkerd-namespace linkerd-lifecycle | kubectl apply -f -
+linkerd dashboard --linkerd-namespace linkerd-lifecycle
 ```
 
 Deploy test framework to `lifecycle` namespace:
@@ -61,7 +61,7 @@ Deploy test framework to `lifecycle` namespace:
 ```bash
 export LIFECYCLE_NS=lifecycle
 kubectl create ns $LIFECYCLE_NS
-cat lifecycle.yml | conduit inject --conduit-namespace conduit-lifecycle - | kubectl -n $LIFECYCLE_NS apply -f -
+cat lifecycle.yml | linkerd inject --linkerd-namespace linkerd-lifecycle - | kubectl -n $LIFECYCLE_NS apply -f -
 ```
 
 Scale `bb-broadcast`, `bb-p2p`, and `bb-terminus`:
@@ -75,7 +75,7 @@ kubectl -n $LIFECYCLE_NS scale --replicas=3 deploy/bb-p2p deploy/bb-terminus
 Browse to Grafana:
 
 ```bash
-conduit dashboard --conduit-namespace conduit-lifecycle --show grafana
+linkerd dashboard --linkerd-namespace linkerd-lifecycle --show grafana
 ```
 
 Tail slow-cooker logs:
@@ -94,5 +94,5 @@ Relevant Grafana dashboards to observe
 
 ```bash
 kubectl delete ns $LIFECYCLE_NS
-kubectl delete ns conduit-lifecycle
+kubectl delete ns linkerd-lifecycle
 ```

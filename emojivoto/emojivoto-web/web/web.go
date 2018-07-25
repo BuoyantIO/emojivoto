@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strconv"
 
-	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-web/gen/proto"
+	pb "github.com/linkerd/linkerd2-examples/emojivoto/emojivoto-web/gen/proto"
 )
 
 type WebApp struct {
