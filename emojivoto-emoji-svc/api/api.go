@@ -2,9 +2,10 @@ package api
 
 import (
 	"context"
+
+	"github.com/buoyantio/emojivoto/emojivoto-emoji-svc/emoji"
+	pb "github.com/buoyantio/emojivoto/emojivoto-emoji-svc/gen/proto"
 	"google.golang.org/grpc"
-	pb "github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/gen/proto"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
 )
 
 type EmojiServiceServer struct {
@@ -27,7 +28,7 @@ func (svc *EmojiServiceServer) ListAll(ctx context.Context, req *pb.ListAllEmoji
 	return &pb.ListAllEmojiResponse{List: list}, nil
 }
 
-func (svc *EmojiServiceServer)  FindByShortcode(ctx context.Context, req *pb.FindByShortcodeRequest) (*pb.FindByShortcodeResponse, error){
+func (svc *EmojiServiceServer) FindByShortcode(ctx context.Context, req *pb.FindByShortcodeRequest) (*pb.FindByShortcodeResponse, error) {
 	var pbE *pb.Emoji
 	foundEmoji := svc.allEmoji.WithShortcode(req.Shortcode)
 	if foundEmoji != nil {

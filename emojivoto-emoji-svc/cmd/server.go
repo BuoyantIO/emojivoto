@@ -1,13 +1,14 @@
 package main
 
 import (
-	"os"
-	"log"
 	"fmt"
+	"log"
 	"net"
+	"os"
+
+	"github.com/buoyantio/emojivoto/emojivoto-emoji-svc/api"
+	"github.com/buoyantio/emojivoto/emojivoto-emoji-svc/emoji"
 	"google.golang.org/grpc"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/api"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-emoji-svc/emoji"
 )
 
 var (
