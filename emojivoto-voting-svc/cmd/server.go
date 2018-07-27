@@ -1,13 +1,14 @@
 package main
 
 import (
-	"os"
-	"log"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/voting"
 	"fmt"
+	"log"
 	"net"
+	"os"
+
+	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/api"
+	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
 	"google.golang.org/grpc"
-	"github.com/runconduit/conduit-examples/emojivoto/emojivoto-voting-svc/api"
 )
 
 var (
