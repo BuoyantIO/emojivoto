@@ -20,7 +20,7 @@ Deploy the application to Minikube using the Linkerd2 service mesh.
 1. Install the `linkerd` CLI
 
 ```
-curl https://run.conduit.io/install | sh
+curl https://run.linkerd.io/install | sh
 ```
 
 2. Install Linkerd2

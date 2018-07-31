@@ -46,23 +46,6 @@ a {
   display: inline;
 }
 
-.conduit-footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  min-height: 70px;
-  height: 8vh;
-  width: 100vw;
-  background-color: #ff576b;
-  color: white;
-  text-align: center;
-  border-top: 2px solid #fff;
-  animation: fadein 2s;
-  -moz-animation: fadein 2s; /* Firefox */
-  -webkit-animation: fadein 2s; /* Safari and Chrome */
-  -o-animation: fadein 2s; /* Opera */
-}
-
 [title~=""] {
     background-color: none;
 }
