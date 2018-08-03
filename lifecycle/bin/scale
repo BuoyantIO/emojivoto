@@ -18,7 +18,6 @@ EOM
 
 NAMESPACES=1
 REPLICAS=1
-INJECT_ARGS=""
 NS_PREFIX="lifecycle"
 NUM_NUMERICS=0
 
@@ -71,7 +70,7 @@ fi
 
 echo "Scaling $NAMESPACES injected, TLS, and baseline namespaces to $REPLICAS replicas..."
 
-for i in `seq 1 $NAMESPACES`;
+for i in $(seq 1 "$NAMESPACES");
 do
   NS="$NS_PREFIX""$i"
 
