@@ -11,7 +11,7 @@ Arguments:
 
 Options:
   -n, --ns-prefix <PREFIX>    The prefix of the created lifecycle namespaces. [default 'lifecycle']
-  -l, --ctrl-prefix <PREFIX>  The prefix of the control plane namespaces to use (must already exist). [default 'linkerd-lifecycle-']
+  -l, --ctrl-prefix <PREFIX>  The prefix of the control plane namespaces to use (must already exist). [default 'linkerd-lifecycle']
       -- <INJECT_ARG>...      Any arguments following a "--" will be passed to the 'linkerd inject' command.
   -h, --help                  Show this message.
 EOM
@@ -20,7 +20,7 @@ EOM
 NAMESPACES=1
 INJECT_ARGS=""
 NS_PREFIX="lifecycle"
-CTRL_NS_PREFIX="linkerd-lifecycle-"
+CTRL_NS_PREFIX="linkerd-lifecycle"
 
 while [ "$1" != "" ]; do
   case $1 in
@@ -33,15 +33,15 @@ while [ "$1" != "" ]; do
     -l | --ctrl-prefix) shift
                         CTRL_NS_PREFIX="${1:-$CTRL_NS_PREFIX}"
                         ;;
-    [0-9]+)             NAMESPACES="$1"
-                        ;;
     --)                 shift
-                        INJECT_ARGS="$@"
+                        INJECT_ARGS="$*"
                         break
                         ;;
-    *)                  echo "Error: Unknown argument '$1'" >&2
+    *[!0-9]*)           echo "Error: Unknown argument '$1'" >&2
                         usage
                         exit 1
+                        ;;
+    *)                  NAMESPACES="$1"
                         ;;
   esac
   shift
@@ -63,13 +63,13 @@ do
   echo "\nDeploying $NS..."
   kubectl create ns "$NS"
   cat lifecycle.yml |
-    linkerd inject --linkerd-namespace "$CTRL_PREFIX" "$INJECT_ARGS" - |
+    linkerd inject --linkerd-namespace "$CTRL_NS_PREFIX" $INJECT_ARGS - |
     kubectl -n "$NS" apply -f -
 
   echo "\nDeploying $NS_TLS..."
   kubectl create ns "$NS_TLS"
   cat lifecycle.yml |
-    linkerd inject --linkerd-namespace "$CTRL_PREFIX"-tls "$INJECT_ARGS" - |
+    linkerd inject --linkerd-namespace "$CTRL_NS_PREFIX"-tls $INJECT_ARGS - |
     kubectl -n "$NS_TLS" apply -f -
 
   echo "\nDeploying $NS_BASELINE..."

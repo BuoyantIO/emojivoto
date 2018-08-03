@@ -31,7 +31,12 @@ while [ "$1" != "" ]; do
       shift
       NS_PREFIX="${1:-$NS_PREFIX}"
       ;;
-    [0-9]+)
+    *[!0-9]*)
+      echo "Error: Unknown argument '$1'" >&2
+      usage
+      exit 1
+      ;;
+    *)
       case "$NUM_NUMERICS" in
         0) NAMESPACES="$1"
            ;;
@@ -42,12 +47,7 @@ while [ "$1" != "" ]; do
            exit 1
            ;;
       esac
-      NUM_NUMERICS=$(("$NUM_NUMERICS" + 1))
-      ;;
-    *)
-      echo "Error: Unknown argument '$1'" >&2
-      usage
-      exit 1
+      NUM_NUMERICS=$(($NUM_NUMERICS + 1))
       ;;
   esac
   shift

@@ -26,11 +26,11 @@ while [ "$1" != "" ]; do
     -n | --ns-prefix)   shift
                         NS_PREFIX="${1:-$NS_PREFIX}"
                         ;;
-    [0-9]+)             NAMESPACES="$1"
-                        ;;
-    *)                  echo "Error: Unknown argument '$1'" >&2
+    *[!0-9]*)           echo "Error: Unknown argument '$1'" >&2
                         usage
                         exit 1
+                        ;;
+    *)                  NAMESPACES="$1"
                         ;;
   esac
   shift
