@@ -6,13 +6,13 @@ NAMESPACES=${1:-1}
 
 echo "Tearing down $NAMESPACES injected, TLS, and baseline namespaces...\n"
 
+TO_DELETE=""
 for i in `seq 1 $NAMESPACES`;
 do
   NS=lifecycle$i
   NS_TLS=$NS-tls
   NS_BASELINE=$NS-baseline
 
-  kubectl delete ns $NS || true
-  kubectl delete ns $NS_TLS || true
-  kubectl delete ns $NS_BASELINE || true
+  TO_DELETE="$TO_DELETE $NS $NS_TLS $NS_BASELINE"
 done
+kubectl delete ns "$TO_DELETE" || true
