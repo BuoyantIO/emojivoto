@@ -7,11 +7,11 @@ usage() {
 Usage: $0 [NAMESPACES] [options]
 
 Arguments:
-  NAMESPACES                  A positive integer that sets the number of namespaces to deploy. [default 1]
+  NAMESPACES                  The number of namespaces to deploy. [default 1]
 
 Options:
-  -n, --ns-prefix <PREFIX>    Set the prefix of the created lifecycle namespaces. [default 'lifecycle']
-  -l, --ctrl-prefix <PREFIX>  Set the prefix of the control plane namespaces to use (must already exist). [default 'linkerd-lifecycle-']
+  -n, --ns-prefix <PREFIX>    The prefix of the created lifecycle namespaces. [default 'lifecycle']
+  -l, --ctrl-prefix <PREFIX>  The prefix of the control plane namespaces to use (must already exist). [default 'linkerd-lifecycle-']
       -- <INJECT_ARG>...      Any arguments following a "--" will be passed to the 'linkerd inject' command.
   -h, --help                  Show this message.
 EOM
