@@ -14,7 +14,6 @@ spec:
   selector:
     matchLabels:
       app: emoji-svc
-  strategy: {}
   template:
     metadata:
       creationTimestamp: null
@@ -33,7 +32,6 @@ spec:
         resources:
           requests:
             cpu: 100m
-status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -56,11 +54,9 @@ metadata:
   name: voting
   namespace: emojivoto
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: voting-svc
-  strategy: {}
   template:
     metadata:
       creationTimestamp: null
@@ -79,7 +75,6 @@ spec:
         resources:
           requests:
             cpu: 100m
-status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -102,11 +97,9 @@ metadata:
   name: web
   namespace: emojivoto
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: web-svc
-  strategy: {}
   template:
     metadata:
       creationTimestamp: null
@@ -131,7 +124,6 @@ spec:
         resources:
           requests:
             cpu: 100m
-status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -147,18 +139,16 @@ spec:
     port: 80
     targetPort: 80
 ---
-apiVersion: apps/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
   creationTimestamp: null
   name: vote-bot
   namespace: emojivoto
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: vote-bot
-  strategy: {}
   template:
     metadata:
       creationTimestamp: null
@@ -176,5 +166,4 @@ spec:
         resources:
           requests:
             cpu: 10m
-status: {}
 ---
