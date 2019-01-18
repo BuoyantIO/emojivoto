@@ -86,10 +86,10 @@ To update the docker images:
 5. Push the docker images to hub.docker.com
 ```bash
 docker login
-docker push buoyantio/emojivoto-svc-base:v5
-docker push buoyantio/emojivoto-emoji-svc:v5
-docker push buoyantio/emojivoto-voting-svc:v5
-docker push buoyantio/emojivoto-web:v5
+docker push buoyantio/emojivoto-svc-base:v6
+docker push buoyantio/emojivoto-emoji-svc:v6
+docker push buoyantio/emojivoto-voting-svc:v6
+docker push buoyantio/emojivoto-web:v6
 ```
 6. Update `emojivoto.yml`, `docker-compose.yml`
 
@@ -100,6 +100,11 @@ docker push buoyantio/emojivoto-web:v5
 
 This app is written with React and bundled with webpack.
 Use the following to run the emojivoto go services and develop on the frontend.
+
+Set up proto files, build apps
+```
+make build
+```
 
 Start the voting service
 ```
@@ -139,4 +144,9 @@ go run emojivoto-web/cmd/server.go
 ```
 export WEB_HOST=localhost:8080
 go run emojivoto-web/cmd/vote-bot/main.go
+```
+
+View emojivoto
+```
+open http://localhost:8080
 ```
