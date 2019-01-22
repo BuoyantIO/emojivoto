@@ -106,12 +106,12 @@ Start the voting service
 GRPC_PORT=8081 go run emojivoto-voting-svc/cmd/server.go
 ```
 
-[In a separate teminal window] Start the emoji service
+[In a separate terminal window] Start the emoji service
 ```
 GRPC_PORT=8082 go run emojivoto-emoji-svc/cmd/server.go
 ```
 
-[In a separate teminal window] Bundle the frontend assets
+[In a separate terminal window] Bundle the frontend assets
 ```
 cd emojivoto-web/webapp
 yarn install
@@ -119,7 +119,7 @@ yarn webpack # one time asset-bundling OR
 yarn webpack-dev-server --port 8083 # bundle/serve reloading assets
 ```
 
-[In a separate teminal window] Start the web service
+[In a separate terminal window] Start the web service
 ```
 export WEB_PORT=8080
 export VOTINGSVC_HOST=localhost:8081
