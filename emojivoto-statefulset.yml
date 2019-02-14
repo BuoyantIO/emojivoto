@@ -5,12 +5,13 @@ metadata:
   name: emojivoto
 ---
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   creationTimestamp: null
   name: emoji
   namespace: emojivoto
 spec:
+  serviceName: emoji
   selector:
     matchLabels:
       app: emoji-svc
@@ -48,12 +49,13 @@ spec:
     targetPort: 8080
 ---
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   creationTimestamp: null
   name: voting
   namespace: emojivoto
 spec:
+  serviceName: voting
   selector:
     matchLabels:
       app: voting-svc
@@ -91,12 +93,13 @@ spec:
     targetPort: 8080
 ---
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   creationTimestamp: null
   name: web
   namespace: emojivoto
 spec:
+  serviceName: web
   selector:
     matchLabels:
       app: web-svc
@@ -140,12 +143,13 @@ spec:
     targetPort: 80
 ---
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   creationTimestamp: null
   name: vote-bot
   namespace: emojivoto
 spec:
+  serviceName: vote-bot
   selector:
     matchLabels:
       app: vote-bot
