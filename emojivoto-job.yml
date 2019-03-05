@@ -4,6 +4,24 @@ kind: Namespace
 metadata:
   name: emojivoto
 ---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: emoji
+  namespace: emojivoto
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: voting
+  namespace: emojivoto
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: web
+  namespace: emojivoto
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -22,6 +40,7 @@ spec:
         app: emoji-svc
     spec:
       restartPolicy: OnFailure
+      serviceAccountName: emoji
       containers:
       - env:
         - name: GRPC_PORT
@@ -68,6 +87,7 @@ spec:
         app: voting-svc
     spec:
       restartPolicy: OnFailure
+      serviceAccountName: voting
       containers:
       - env:
         - name: GRPC_PORT
@@ -114,6 +134,7 @@ spec:
         app: web-svc
     spec:
       restartPolicy: OnFailure
+      serviceAccountName: web
       containers:
       - env:
         - name: WEB_PORT
