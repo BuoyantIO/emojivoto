@@ -45,7 +45,7 @@ spec:
       - env:
         - name: GRPC_PORT
           value: "8080"
-        image: buoyantio/emojivoto-emoji-svc:v6
+        image: buoyantio/emojivoto-emoji-svc:v7
         name: emoji-svc
         ports:
         - containerPort: 8080
@@ -92,7 +92,7 @@ spec:
       - env:
         - name: GRPC_PORT
           value: "8080"
-        image: buoyantio/emojivoto-voting-svc:v6
+        image: buoyantio/emojivoto-voting-svc:v7
         name: voting-svc
         ports:
         - containerPort: 8080
@@ -145,7 +145,7 @@ spec:
           value: voting-svc.emojivoto:8080
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: buoyantio/emojivoto-web:v6
+        image: buoyantio/emojivoto-web:v7
         name: web-svc
         ports:
         - containerPort: 80
@@ -193,7 +193,7 @@ spec:
         env:
         - name: WEB_HOST
           value: web-svc.emojivoto:80
-        image: buoyantio/emojivoto-web:v6
+        image: buoyantio/emojivoto-web:v7
         name: vote-bot
         resources:
           requests:
