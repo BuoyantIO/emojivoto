@@ -1,9 +1,10 @@
-FROM buoyantio/emojivoto-svc-base:v7
+FROM buoyantio/emojivoto-svc-base:v8
 
 ARG svc_name
 
 COPY $svc_name/target/ /usr/local/bin/
 
-# ARG variables arent available for ENTRYPOINT
-ENV SVC_NAME $svc_name
-ENTRYPOINT cd /usr/local/bin && $SVC_NAME
+COPY --from=gcr.io/linkerd-io/await:v0.1.0 /linkerd-await /usr/local/bin
+ENV NAME=$svc_name
+ENTRYPOINT [ "linkerd-await", "--" ]
+CMD [ "sh", "-c", "$NAME" ]

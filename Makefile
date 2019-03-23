@@ -18,19 +18,20 @@ voting-svc:
 
 build: web emoji-svc voting-svc
 
-deploy-to-minikube:
+containers: build build-base-docker-image
 	$(MAKE) -C emojivoto-web build-container
 	$(MAKE) -C emojivoto-emoji-svc build-container
 	$(MAKE) -C emojivoto-voting-svc build-container
+
+deploy-to-minikube: containers
 	kubectl delete -f emojivoto.yml || echo "ok"
 	kubectl apply -f emojivoto.yml
 
-deploy-to-docker-compose:
+stop-docker-compose:
 	docker-compose stop
 	docker-compose rm -vf
-	$(MAKE) -C emojivoto-web build-container
-	$(MAKE) -C emojivoto-emoji-svc build-container
-	$(MAKE) -C emojivoto-voting-svc build-container
+
+deploy-to-docker-compose: stop-docker-compose containers
 	docker-compose -f ./docker-compose.yml up -d
 
 integration-tests: deploy-to-docker-compose
