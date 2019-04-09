@@ -56,8 +56,12 @@ func (c *MockVotingServiceClient) vote(shortcode string) (*pb.VoteResponse, erro
 	return &pb.VoteResponse{}, nil
 }
 
-func (c *MockVotingServiceClient) VotePoop(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
+func (c *MockVotingServiceClient) VoteDoughnut(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
 	return nil, fmt.Errorf("ERROR")
+}
+
+func (c *MockVotingServiceClient) VotePoop(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
+	return c.vote(":poop:")
 }
 
 func (c *MockVotingServiceClient) VoteJoy(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
@@ -326,10 +330,6 @@ func (c *MockVotingServiceClient) VoteBurrito(_ context.Context, _ *pb.VoteReque
 
 func (c *MockVotingServiceClient) VoteRamen(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
 	return c.vote(":ramen:")
-}
-
-func (c *MockVotingServiceClient) VoteDoughnut(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {
-	return c.vote(":doughnut:")
 }
 
 func (c *MockVotingServiceClient) VoteChampagne(_ context.Context, _ *pb.VoteRequest, _ ...grpc.CallOption) (*pb.VoteResponse, error) {

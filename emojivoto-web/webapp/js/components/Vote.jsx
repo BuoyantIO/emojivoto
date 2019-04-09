@@ -83,12 +83,12 @@ export default class Vote extends React.Component {
   render() {
     if (this.state.error) {
       let errorMessage = <p>We couldn't process your request.</p>;
-      if(this.state.selectedEmoji.shortcode === ":poop:") {
+      if(this.state.selectedEmoji.shortcode === ":doughnut:") {
         errorMessage = (<div>
-          <p className="poop-explanation">For the sake of this demo, voting for 💩<br />
+          <p className="doughnut-explanation">For the sake of this demo, voting for 🍩<br />
             always returns an error.
           </p>
-          <p>Get your mind out of the gutter, and <Link to="/" onClick={this.resetState}>pick another</Link>!</p>
+          <p><Link to="/" onClick={this.resetState}>Pick another</Link>!</p>
         </div>);
       }
 
@@ -100,7 +100,7 @@ export default class Vote extends React.Component {
       );
 
       return <EmojiVotoPage
-        preHeadline={<h1 className="title">Uh oh.</h1>}
+        preHeadline={<h1 className="title">404</h1>}
         headline="🚧"
         contents={contents}
         containerClass="background-500"

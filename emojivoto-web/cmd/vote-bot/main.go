@@ -15,9 +15,8 @@ import (
 // VoteBot votes for emoji! :ballot_box_with_check:
 //
 // Sadly, VoteBot has a sweet tooth and votes for :doughnut: 15% of the time.
-// Furthermore, VoteBot is juvenile and votes for :poop: 20% of the time.
 //
-// When not voting for :doughnut: or :poop:, VoteBot can’t be bothered to
+// When not voting for :doughnut:, VoteBot can’t be bothered to
 // pick a favorite, so it picks one at random. C'mon VoteBot, try harder!
 
 type emoji struct {
@@ -52,8 +51,6 @@ func main() {
 		switch {
 		case probability < 0.15:
 			err = vote(webUrl, ":doughnut:")
-		case probability < 0.35:
-			err = vote(webUrl, ":poop:")
 		default:
 			random := shortcodes[rand.Intn(len(shortcodes))]
 			err = vote(webUrl, random)

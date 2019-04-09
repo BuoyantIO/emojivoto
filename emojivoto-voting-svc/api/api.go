@@ -18,8 +18,12 @@ func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
 	return &pb.VoteResponse{}, err
 }
 
-func (pS *PollServiceServer) VotePoop(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
+func (pS *PollServiceServer) VoteDoughnut(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
 	return nil, fmt.Errorf("ERROR")
+}
+
+func (pS *PollServiceServer) VotePoop(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
+	return pS.vote(":poop:")
 }
 
 func (pS *PollServiceServer) VoteJoy(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
@@ -288,10 +292,6 @@ func (pS *PollServiceServer) VoteBurrito(_ context.Context, _ *pb.VoteRequest) (
 
 func (pS *PollServiceServer) VoteRamen(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
 	return pS.vote(":ramen:")
-}
-
-func (pS *PollServiceServer) VoteDoughnut(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
-	return pS.vote(":doughnut:")
 }
 
 func (pS *PollServiceServer) VoteChampagne(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {

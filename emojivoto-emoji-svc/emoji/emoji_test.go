@@ -49,7 +49,7 @@ func TestFindByShortcode(t *testing.T) {
 		}
 	})
 
-	t.Run("returns false when cant fiund emoji", func(t *testing.T) {
+	t.Run("returns false when can't find emoji", func(t *testing.T) {
 		for _, shortcode := range []string{"these", "arent", "emoji", "shortcodes"} {
 			found := allEmoji.WithShortcode(shortcode)
 			if found != nil {
