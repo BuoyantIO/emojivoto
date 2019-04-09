@@ -17,10 +17,9 @@ type inMemoryAllEmoji struct {
 }
 
 var top100Emoji = []string{
-	":poop:",
 	":joy:",
 	":sunglasses:",
-	":relaxed:",
+	":doughnut:",
 	":stuck_out_tongue_winking_eye:",
 	":money_mouth_face:",
 	":flushed:",
@@ -85,7 +84,6 @@ var top100Emoji = []string{
 	":taco:",
 	":burrito:",
 	":ramen:",
-	":doughnut:",
 	":champagne:",
 	":tropical_drink:",
 	":beer:",
@@ -117,6 +115,7 @@ var top100Emoji = []string{
 	":checkered_flag:",
 	":crossed_swords:",
 	":floppy_disk:",
+	":poop:",
 }
 
 func (allEmoji *inMemoryAllEmoji) List() []*Emoji {

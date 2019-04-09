@@ -64,8 +64,7 @@ The web app will be running on port 8080 of your docker host.
 The `VoteBot` service can generate some traffic for you. It votes on emoji
 "randomly" as follows:
 - It votes for :doughnut: 15% of the time.
-- It votes for :poop: 20% of the time.
-- When not voting for :doughnut: or :poop:, it picks an emoji at random
+- When not voting for :doughnut:, it picks an emoji at random
 
 If you're running the app using the instructions above, the VoteBot will have
 been deployed and will start sending traffic to the vote endpoint.
@@ -86,10 +85,10 @@ To update the docker images:
 5. Push the docker images to hub.docker.com
 ```bash
 docker login
-docker push buoyantio/emojivoto-svc-base:v7
-docker push buoyantio/emojivoto-emoji-svc:v7
-docker push buoyantio/emojivoto-voting-svc:v7
-docker push buoyantio/emojivoto-web:v7
+docker push buoyantio/emojivoto-svc-base:v8
+docker push buoyantio/emojivoto-emoji-svc:v8
+docker push buoyantio/emojivoto-voting-svc:v8
+docker push buoyantio/emojivoto-web:v8
 ```
 6. Update `emojivoto.yml`, `docker-compose.yml`
 
