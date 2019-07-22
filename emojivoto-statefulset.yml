@@ -29,7 +29,7 @@ metadata:
   name: emoji
   namespace: emojivoto
 spec:
-  serviceName: emoji
+  serviceName: emoji-svc
   selector:
     matchLabels:
       app: emoji-svc
@@ -74,7 +74,7 @@ metadata:
   name: voting
   namespace: emojivoto
 spec:
-  serviceName: voting
+  serviceName: voting-svc
   selector:
     matchLabels:
       app: voting-svc
@@ -119,7 +119,7 @@ metadata:
   name: web
   namespace: emojivoto
 spec:
-  serviceName: web
+  serviceName: web-svc
   selector:
     matchLabels:
       app: web-svc
@@ -155,7 +155,7 @@ metadata:
   name: web-svc
   namespace: emojivoto
 spec:
-  type: LoadBalancer
+  clusterIP: None
   selector:
     app: web-svc
   ports:
