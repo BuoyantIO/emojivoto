@@ -6,4 +6,4 @@ required = ["github.com/golang/protobuf/protoc-gen-go"]
 
 [[constraint]]
   name = "github.com/golang/protobuf"
-  version = "v1.2.0"
+  version = "v1.3.2"

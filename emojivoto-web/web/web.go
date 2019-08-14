@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"go.opencensus.io/plugin/ochttp"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
 )
@@ -374,6 +375,12 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
+func handle(path string, h func (w http.ResponseWriter, r *http.Request)) {
+	http.Handle(path, &ochttp.Handler {
+		Handler: http.HandlerFunc(h),
+	})
+}
+
 func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
@@ -383,13 +390,13 @@ func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClie
 	}
 
 	log.Printf("Starting web server on WEB_PORT=[%s]", webPort)
-	http.HandleFunc("/", webApp.indexHandler)
-	http.HandleFunc("/leaderboard", webApp.indexHandler)
-	http.HandleFunc("/js", webApp.jsHandler)
-	http.HandleFunc("/img/favicon.ico", webApp.faviconHandler)
-	http.HandleFunc("/api/list", webApp.listEmojiHandler)
-	http.HandleFunc("/api/vote", webApp.voteEmojiHandler)
-	http.HandleFunc("/api/leaderboard", webApp.leaderboardHandler)
+	handle("/", webApp.indexHandler)
+	handle("/leaderboard", webApp.indexHandler)
+	handle("/js", webApp.jsHandler)
+	handle("/img/favicon.ico", webApp.faviconHandler)
+	handle("/api/list", webApp.listEmojiHandler)
+	handle("/api/vote", webApp.voteEmojiHandler)
+	handle("/api/leaderboard", webApp.leaderboardHandler)
 
 	// TODO: make static assets dir configurable
 	http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
