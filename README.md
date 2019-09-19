@@ -99,6 +99,12 @@ To update the docker images:
 
 1. Update `emojivoto.yml`, `docker-compose.yml`
 
+## Prometheus Metrics
+
+By default the voting service exposes Prometheus metrics about current vote count on port `8801`.
+
+This can be disabled by unsetting the `PROM_PORT` environment variable.
+
 ## Local Development
 
 ### Emojivoto webapp

@@ -24,11 +24,15 @@ spec:
       - env:
         - name: GRPC_PORT
           value: "8080"
+        - name: PROM_PORT
+          value: "8801"
         image: buoyantio/emojivoto-voting-svc:v9
         name: voting-svc
         ports:
         - containerPort: 8080
           name: grpc
+        - containerPort: 8801
+          name: prom
         resources:
           requests:
             cpu: 100m
@@ -45,3 +49,6 @@ spec:
   - name: grpc
     port: 8080
     targetPort: 8080
+  - name: prom
+    port: 8801
+    targetPort: 8801
