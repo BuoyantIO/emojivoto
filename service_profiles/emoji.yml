@@ -1,0 +1,22 @@
+# This file was generated using the Emoji.proto file as described in the
+# Linkerd documentation:
+# https://linkerd.io/2/tasks/setting-up-service-profiles/#protobuf
+#
+# The command used to generate the ServiceProfile is:
+# linkerd profile --proto ../proto/Emoji.proto emoji-svc -n emojivoto
+
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: emoji-svc.emojivoto.svc.cluster.local
+  namespace: emojivoto
+spec:
+  routes:
+   - condition:
+       method: POST
+       pathRegex: /emojivoto\.v1\.EmojiService/ListAll
+     name: ListAll
+   - condition:
+       method: POST
+       pathRegex: /emojivoto\.v1\.EmojiService/FindByShortcode
+     name: FindByShortcode

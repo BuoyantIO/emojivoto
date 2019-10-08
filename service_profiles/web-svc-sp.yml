@@ -1,0 +1,22 @@
+# This file was generated using the web.swagger file following the
+# instructions in the Linkerd documentation:
+# https://linkerd.io/2/tasks/setting-up-service-profiles/#swagger
+#
+# The command used to generate the ServiceProfile is:
+# linkerd profile --open-api web.swagger web-svc -n emojivoto
+
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: web-svc.emojivoto.svc.cluster.local
+  namespace: emojivoto
+spec:
+  routes:
+    - condition:
+        method: GET
+        pathRegex: /api/list
+      name: GET /api/list
+    - condition:
+        method: GET
+        pathRegex: /api/vote
+      name: GET /api/vote
