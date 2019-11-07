@@ -1,0 +1,17 @@
+- op: replace
+  path: /kind
+  value: Job
+
+- op: replace
+  path: /apiVersion
+  value: batch/v1
+
+- op: remove
+  path: /spec/replicas
+
+- op: remove
+  path: /spec/selector
+
+- op: add
+  path: /spec/template/spec/restartPolicy
+  value: OnFailure

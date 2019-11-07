@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emoji
+spec:
+  serviceName: emoji-svc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting
+spec:
+  serviceName: voting-svc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  serviceName: web-svc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote-bot
+spec:
+  serviceName: vote-bot
