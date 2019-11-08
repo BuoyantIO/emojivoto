@@ -10,6 +10,10 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"contrib.go.opencensus.io/exporter/ocagent"
+	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/trace"
 )
 
 // VoteBot votes for emoji! :ballot_box_with_check:
@@ -18,6 +22,12 @@ import (
 //
 // When not voting for :doughnut:, VoteBot can’t be bothered to
 // pick a favorite, so it picks one at random. C'mon VoteBot, try harder!
+
+var (
+	client = &http.Client{Transport: &ochttp.Transport{}}
+
+	ocagentHost = os.Getenv("OC_AGENT_HOST")
+)
 
 type emoji struct {
 	Shortcode string
@@ -30,6 +40,17 @@ func main() {
 	if webHost == "" {
 		log.Fatalf("WEB_HOST environment variable must me set")
 	}
+
+	oce, err := ocagent.NewExporter(
+		ocagent.WithInsecure(),
+		ocagent.WithReconnectionPeriod(5*time.Second),
+		ocagent.WithAddress(ocagentHost),
+		ocagent.WithServiceName("vote-bot"))
+	if err != nil {
+		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+	}
+	trace.RegisterExporter(oce)
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	webUrl := "http://" + webHost
 	if _, err := url.Parse(webUrl); err != nil {
@@ -64,7 +85,7 @@ func main() {
 func shortcodes(webUrl string) ([]string, error) {
 	url := fmt.Sprintf("%s/api/list", webUrl)
 
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +114,7 @@ func vote(webUrl string, shortcode string) error {
 	fmt.Printf("✔ Voting for %s\n", shortcode)
 	url := fmt.Sprintf("%s/api/vote?choice=%s", webUrl, shortcode)
 
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return err
 	}
