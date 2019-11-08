@@ -1,0 +1,27 @@
+bases:
+- ../deployment
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: web
+  path: patch.yml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: emoji
+  path: patch.yml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: voting
+  path: patch.yml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: vote-bot
+  path: patch.yml

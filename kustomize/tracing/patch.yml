@@ -1,0 +1,11 @@
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: OC_AGENT_HOST
+    value: oc-collector.tracing:55678
+
+- op: add
+  path: /spec/template/metadata/annotations
+  value:
+    linkerd.io/inject: enabled
+    config.linkerd.io/trace-collector: oc-collector.tracing:55678
