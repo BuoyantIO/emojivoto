@@ -19,7 +19,7 @@ spec:
         env:
         - name: WEB_HOST
           value: web-svc.emojivoto:80
-        image: buoyantio/emojivoto-web:v8
+        image: buoyantio/emojivoto-web:v9
         name: vote-bot
         resources:
           requests:

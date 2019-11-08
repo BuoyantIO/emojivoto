@@ -24,7 +24,7 @@ spec:
       - env:
         - name: GRPC_PORT
           value: "8080"
-        image: buoyantio/emojivoto-emoji-svc:v8
+        image: buoyantio/emojivoto-emoji-svc:v9
         name: emoji-svc
         ports:
         - containerPort: 8080
