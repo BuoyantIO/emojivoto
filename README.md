@@ -19,31 +19,33 @@ Deploy the application to Minikube using the Linkerd2 service mesh.
 
 1. Install the `linkerd` CLI
 
-```
+```bash
 curl https://run.linkerd.io/install | sh
 ```
 
-2. Install Linkerd2
+1. Install Linkerd2
 
-```
+```bash
 linkerd install | kubectl apply -f -
 ```
 
-3. View the dashboard!
+1. View the dashboard!
 
-```
+```bash
 linkerd dashboard
 ```
 
-4. Inject, Deploy, and Enjoy
+1. Inject, Deploy, and Enjoy
 
-```
-linkerd inject emojivoto.yml | kubectl apply -f -
+```bash
+kubectl kustomize kustomize/deployment | \
+    linkerd inject - | \
+    kubectl apply -f -
 ```
 
-5. Use the app!
+1. Use the app!
 
-```
+```bash
 minikube -n emojivoto service web-svc
 ```
 
@@ -53,7 +55,7 @@ It's also possible to run the app with docker-compose (without Linkerd2).
 
 Build and run:
 
-```
+```bash
 make deploy-to-docker-compose
 ```
 
@@ -63,6 +65,7 @@ The web app will be running on port 8080 of your docker host.
 
 The `VoteBot` service can generate some traffic for you. It votes on emoji
 "randomly" as follows:
+
 - It votes for :doughnut: 15% of the time.
 - When not voting for :doughnut:, it picks an emoji at random
 
@@ -70,7 +73,8 @@ If you're running the app using the instructions above, the VoteBot will have
 been deployed and will start sending traffic to the vote endpoint.
 
 If you'd like to run the bot manually:
-```
+
+```bash
 export WEB_HOST=localhost:8080 # replace with your web location
 go run emojivoto-web/cmd/vote-bot/main.go
 ```
@@ -78,20 +82,22 @@ go run emojivoto-web/cmd/vote-bot/main.go
 ## Releasing a new version
 
 To update the docker images:
-1. Update the tag name in `common.mk`
-2. Update the base image tags in `Makefile` and `Dockerfile`
-3. Build base docker image `make build-base-docker-image`
-4. Build docker images `make build`
-5. Push the docker images to hub.docker.com
-```bash
-docker login
-docker push buoyantio/emojivoto-svc-base:v8
-docker push buoyantio/emojivoto-emoji-svc:v8
-docker push buoyantio/emojivoto-voting-svc:v8
-docker push buoyantio/emojivoto-web:v8
-```
-6. Update `emojivoto.yml`, `docker-compose.yml`
 
+1. Update the tag name in `common.mk`
+1. Update the base image tags in `Makefile` and `Dockerfile`
+1. Build base docker image `make build-base-docker-image`
+1. Build docker images `make build`
+1. Push the docker images to hub.docker.com
+
+    ```bash
+    docker login
+    docker push buoyantio/emojivoto-svc-base:v9
+    docker push buoyantio/emojivoto-emoji-svc:v9
+    docker push buoyantio/emojivoto-voting-svc:v9
+    docker push buoyantio/emojivoto-web:v9
+    ```
+
+1. Update `emojivoto.yml`, `docker-compose.yml`
 
 ## Local Development
 
@@ -101,22 +107,26 @@ This app is written with React and bundled with webpack.
 Use the following to run the emojivoto go services and develop on the frontend.
 
 Set up proto files, build apps
-```
+
+```bash
 make build
 ```
 
 Start the voting service
-```
+
+```bash
 GRPC_PORT=8081 go run emojivoto-voting-svc/cmd/server.go
 ```
 
 [In a separate terminal window] Start the emoji service
-```
+
+```bash
 GRPC_PORT=8082 go run emojivoto-emoji-svc/cmd/server.go
 ```
 
 [In a separate terminal window] Bundle the frontend assets
-```
+
+```bash
 cd emojivoto-web/webapp
 yarn install
 yarn webpack # one time asset-bundling OR
@@ -124,7 +134,8 @@ yarn webpack-dev-server --port 8083 # bundle/serve reloading assets
 ```
 
 [In a separate terminal window] Start the web service
-```
+
+```bash
 export WEB_PORT=8080
 export VOTINGSVC_HOST=localhost:8081
 export EMOJISVC_HOST=localhost:8082
@@ -140,12 +151,14 @@ go run emojivoto-web/cmd/server.go
 ```
 
 [Optional] Start the vote bot for automatic traffic generation.
-```
+
+```bash
 export WEB_HOST=localhost:8080
 go run emojivoto-web/cmd/vote-bot/main.go
 ```
 
 View emojivoto
-```
+
+```bash
 open http://localhost:8080
 ```

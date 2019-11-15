@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote-bot
+  namespace: emojivoto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vote-bot
+  template:
+    metadata:
+      labels:
+        app: vote-bot
+    spec:
+      containers:
+      - command:
+        - emojivoto-vote-bot
+        env:
+        - name: WEB_HOST
+          value: web-svc.emojivoto:80
+        image: buoyantio/emojivoto-web:v9
+        name: vote-bot
+        resources:
+          requests:
+            cpu: 10m

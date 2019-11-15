@@ -1,6 +1,6 @@
 svc_name := emojivoto-emoji-svc
 
-all: clean protoc dep test package
+all: clean protoc test package
 
 include ../common.mk
 

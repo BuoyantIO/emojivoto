@@ -1,6 +1,6 @@
 svc_name := emojivoto-web
 
-all: clean protoc dep webpack package-web test package
+all: clean protoc webpack package-web test package
 
 include ../common.mk
 

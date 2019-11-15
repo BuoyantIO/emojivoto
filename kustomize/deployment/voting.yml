@@ -1,0 +1,47 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: voting
+  namespace: emojivoto
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting
+  namespace: emojivoto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-svc
+  template:
+    metadata:
+      labels:
+        app: voting-svc
+    spec:
+      serviceAccountName: voting
+      containers:
+      - env:
+        - name: GRPC_PORT
+          value: "8080"
+        image: buoyantio/emojivoto-voting-svc:v9
+        name: voting-svc
+        ports:
+        - containerPort: 8080
+          name: grpc
+        resources:
+          requests:
+            cpu: 100m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voting-svc
+  namespace: emojivoto
+spec:
+  selector:
+    app: voting-svc
+  ports:
+  - name: grpc
+    port: 8080
+    targetPort: 8080

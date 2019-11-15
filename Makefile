@@ -33,11 +33,6 @@ deploy-to-docker-compose:
 	$(MAKE) -C emojivoto-voting-svc build-container
 	docker-compose -f ./docker-compose.yml up -d
 
-integration-tests: deploy-to-docker-compose
-	WEB_URL=http://localhost:8080 $(MAKE) -C integration_test test
-	docker-compose stop
-	docker-compose rm -vf
-
 push-%:
 	docker push buoyantio/emojivoto-$*:$(IMAGE_TAG)
 

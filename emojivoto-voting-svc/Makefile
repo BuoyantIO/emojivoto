@@ -1,5 +1,5 @@
 svc_name := emojivoto-voting-svc
 
-all: clean protoc dep test package
+all: clean protoc test package
 
 include ../common.mk
