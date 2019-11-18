@@ -14,6 +14,7 @@ import (
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
 
 	"contrib.go.opencensus.io/exporter/ocagent"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/trace"
@@ -63,8 +64,14 @@ func main() {
 
 	// Start grpc server
 	go func() {
-		grpcServer := grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
+		grpc_prometheus.EnableHandlingTimeHistogram()
+		grpcServer := grpc.NewServer(
+			grpc.StatsHandler(&ocgrpc.ServerHandler{}),
+			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
+			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		)
 		api.NewGrpServer(grpcServer, poll)
+		grpc_prometheus.Register(grpcServer)
 		log.Printf("Starting grpc server on GRPC_PORT=[%s]", grpcPort)
 		err := grpcServer.Serve(lis)
 		errs <- err
