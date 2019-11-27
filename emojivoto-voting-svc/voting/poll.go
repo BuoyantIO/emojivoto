@@ -4,6 +4,9 @@ import (
 	"log"
 	"sort"
 	"sync"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 type Result struct {
@@ -27,6 +30,7 @@ type Poll interface {
 type inMemoryPoll struct {
 	votes map[string]int
 	sync.RWMutex
+	counter *prometheus.CounterVec
 }
 
 func (p *inMemoryPoll) Vote(choice string) error {
@@ -38,6 +42,7 @@ func (p *inMemoryPoll) Vote(choice string) error {
 	} else {
 		p.votes[choice] = 1
 	}
+	p.counter.With(prometheus.Labels{"emoji": choice}).Inc()
 	log.Printf("Voted for [%s], which now has a total of [%d] votes", choice, p.votes[choice])
 	return nil
 }
@@ -57,8 +62,15 @@ func (p *inMemoryPoll) Results() ([]*Result, error) {
 	return results, nil
 }
 
+var counter *prometheus.CounterVec = promauto.NewCounterVec(prometheus.CounterOpts{
+	Name: "emojivoto_votes_total",
+	Help: "Number of emoji votes",
+}, []string{"emoji"})
+
 func NewPoll() Poll {
-	return &inMemoryPoll{
-		votes: make(map[string]int, 0),
+	poll := &inMemoryPoll{
+		votes:   make(map[string]int, 0),
+		counter: counter,
 	}
+	return poll
 }
