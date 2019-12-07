@@ -61,6 +61,14 @@ make deploy-to-docker-compose
 
 The web app will be running on port 8080 of your docker host.
 
+### Via URL
+
+To deploy standalone to an existing cluster:
+
+```bash
+kubectl apply -k github.com/BuoyantIO/emojivoto/kustomize/deployment
+```
+
 ### Generating some traffic
 
 The `VoteBot` service can generate some traffic for you. It votes on emoji
