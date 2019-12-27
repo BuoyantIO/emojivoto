@@ -149,3 +149,61 @@ View emojivoto
 ```
 open http://localhost:8080
 ```
+
+### Testing Linkerd Service Profiles
+
+[Service Profiles](https://linkerd.io/2/features/service-profiles/) are a
+feature of Linkerd that provide per-route functionality such as telemetry,
+timeouts, and retries. The Emojivoto application is designed to showcase
+Service Profiles by following the instructions below.
+
+#### Generate the ServiceProfile definitions from the `.proto` files
+
+The `emoji` and `voting` services are [gRPC](https://grpc.io/) applications
+which have [Protocol Buffers (protobuf)](https://developers.google.com/protocol-buffers)
+definition files. These `.proto` files can be used as input to the `linkerd
+profile` command in order to create the `ServiceProfile` definition yaml files.
+The [Linkerd Service Profile documentation](https://linkerd.io/2/tasks/setting-up-service-profiles/#protobuf)
+outlines the steps necessary to create the yaml files, and these are the
+commands you can use from the root of this repository:
+
+```
+linkerd profile --proto proto/Emoji.proto emoji-svc -n emojivoto
+```
+```
+linkerd profile --proto proto/Voting.proto voting-svc -n emojivoto
+```
+
+Each of these commands will output yaml that you can write to a file or pipe
+directly to `kubectl apply`. For example:
+
+- To write to a file:
+```
+linkerd profile --proto proto/Emoji.proto emoji-svc -n emojivoto > emoji
+-sp.yaml
+```
+
+- To apply directly:
+```
+linkerd profile --proto proto/Voting.proto voting-svc -n emojivoto | \
+kubectl apply -f -
+```
+
+#### Generate the ServiceProfile definition for the Web deployment
+
+The `web-svc` deployment of emojivoto is a React application that is hosted by a
+Go server. We can use [`linkerd profile auto creation`](https://linkerd.io/2/tasks/setting-up-service-profiles/#auto-creation)
+to generate the `ServiceProfile` resource for the web-svc with this command:
+
+```bash
+linkerd profile -n emojivoto web-svc --tap deploy/web --tap-duration 10s | \
+   kubectl apply -f -
+```
+
+Now that the service profiles are generated for all the services, you can
+observe the per-route metrics for each service on the [Linkerd Dashboard](https://linkerd.io/2/features/dashboard/)
+or with the `linkerd routes` command
+
+```bash
+linkerd -n emojivoto routes deploy/web-svc --to svc/emoji-svc
+```
