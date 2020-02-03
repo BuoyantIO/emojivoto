@@ -105,7 +105,19 @@ To update the docker images:
     docker push buoyantio/emojivoto-web:v9
     ```
 
-1. Update `emojivoto.yml`, `docker-compose.yml`
+1. Update:
+- `docker-compose.yml`
+- (`kustomize/deployment/emoji.yml`),
+- (`kustomize/deployment/vote-bot.yml`),
+- (`kustomize/deployment/voting.yml`),
+- (`kustomize/deployment/web.yml`),
+1. Distribute to the Linkerd website repo
+
+    ```bash
+    kubectl kustomize kustomize/deployment  > ../website/run.linkerd.io/public/emojivoto.yml
+    kubectl kustomize kustomize/daemonset   > ../website/run.linkerd.io/public/emojivoto-daemonset.yml
+    kubectl kustomize kustomize/statefulset > ../website/run.linkerd.io/public/emojivoto-statefulset.yml
+    ```
 
 ## Prometheus Metrics
 
