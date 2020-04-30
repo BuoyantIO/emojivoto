@@ -99,10 +99,10 @@ To update the docker images:
 
     ```bash
     docker login
-    docker push buoyantio/emojivoto-svc-base:v9
-    docker push buoyantio/emojivoto-emoji-svc:v9
-    docker push buoyantio/emojivoto-voting-svc:v9
-    docker push buoyantio/emojivoto-web:v9
+    docker push buoyantio/emojivoto-svc-base:v10
+    docker push buoyantio/emojivoto-emoji-svc:v10
+    docker push buoyantio/emojivoto-voting-svc:v10
+    docker push buoyantio/emojivoto-web:v10
     ```
 
 1. Update:
