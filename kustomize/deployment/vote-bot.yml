@@ -12,10 +12,12 @@ spec:
   selector:
     matchLabels:
       app: vote-bot
+      version: v10
   template:
     metadata:
       labels:
         app: vote-bot
+        version: v10
     spec:
       containers:
       - command:
