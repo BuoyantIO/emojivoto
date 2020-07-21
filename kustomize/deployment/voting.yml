@@ -18,10 +18,12 @@ spec:
   selector:
     matchLabels:
       app: voting-svc
+      version: v10
   template:
     metadata:
       labels:
         app: voting-svc
+        version: v10
     spec:
       serviceAccountName: voting
       containers:
