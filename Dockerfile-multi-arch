@@ -5,6 +5,7 @@ FROM --platform=$BUILDPLATFORM golang:1.15.0 as golang
 WORKDIR /emojivoto-build
 
 # install protobuf
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y protobuf-compiler
 RUN go get github.com/golang/protobuf/protoc-gen-go
 
@@ -45,6 +46,7 @@ RUN apt-get update \
 ARG svc_name
 COPY --from=build /emojivoto-build/$svc_name/target/ /usr/local/bin/
 
-# ARG variables arent available for ENTRYPOINT
+# ARG variables are not available for ENTRYPOINT
 ENV SVC_NAME $svc_name
-ENTRYPOINT cd /usr/local/bin && $SVC_NAME
+WORKDIR /usr/local/bin
+ENTRYPOINT $SVC_NAME
