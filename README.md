@@ -19,35 +19,35 @@ Deploy the application to Minikube using the Linkerd2 service mesh.
 
 1. Install the `linkerd` CLI
 
-```bash
-curl https://run.linkerd.io/install | sh
-```
+    ```bash
+    curl https://run.linkerd.io/install | sh
+    ```
 
 1. Install Linkerd2
 
-```bash
-linkerd install | kubectl apply -f -
-```
+    ```bash
+    linkerd install | kubectl apply -f -
+    ```
 
 1. View the dashboard!
 
-```bash
-linkerd dashboard
-```
+    ```bash
+    linkerd dashboard
+    ```
 
 1. Inject, Deploy, and Enjoy
 
-```bash
-kubectl kustomize kustomize/deployment | \
-    linkerd inject - | \
-    kubectl apply -f -
-```
+    ```bash
+    kubectl kustomize kustomize/deployment | \
+        linkerd inject - | \
+        kubectl apply -f -
+    ```
 
 1. Use the app!
 
-```bash
-minikube -n emojivoto service web-svc
-```
+    ```bash
+    minikube -n emojivoto service web-svc
+    ```
 
 ### In docker-compose
 
@@ -89,28 +89,31 @@ go run emojivoto-web/cmd/vote-bot/main.go
 
 ## Releasing a new version
 
-To update the docker images:
+To build and push multi-arch docker images:
 
 1. Update the tag name in `common.mk`
-1. Update the base image tags in `Makefile` and `Dockerfile`
-1. Build base docker image `make build-base-docker-image`
-1. Build docker images `make build`
-1. Push the docker images to hub.docker.com
+1. Create the Buildx builder instance
+
+    ```bash
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    docker buildx create --name=multiarch-builder --driver=docker-container --use
+    docker buildx inspect multiarch-builder --bootstrap
+    ```
+
+1. Build & push the multi-arch docker images to hub.docker.com
 
     ```bash
     docker login
-    docker push buoyantio/emojivoto-svc-base:v10
-    docker push buoyantio/emojivoto-emoji-svc:v10
-    docker push buoyantio/emojivoto-voting-svc:v10
-    docker push buoyantio/emojivoto-web:v10
+    make multi-arch
     ```
 
 1. Update:
-- `docker-compose.yml`
-- (`kustomize/deployment/emoji.yml`),
-- (`kustomize/deployment/vote-bot.yml`),
-- (`kustomize/deployment/voting.yml`),
-- (`kustomize/deployment/web.yml`),
+    - `docker-compose.yml`
+    - `kustomize/deployment/emoji.yml`
+    - `kustomize/deployment/vote-bot.yml`
+    - `kustomize/deployment/voting.yml`
+    - `kustomize/deployment/web.yml`
+
 1. Distribute to the Linkerd website repo
 
     ```bash

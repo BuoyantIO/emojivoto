@@ -18,6 +18,11 @@ voting-svc:
 
 build: web emoji-svc voting-svc
 
+multi-arch:
+	$(MAKE) -C emojivoto-web build-multi-arch
+	$(MAKE) -C emojivoto-emoji-svc build-multi-arch
+	$(MAKE) -C emojivoto-voting-svc build-multi-arch
+
 deploy-to-minikube:
 	$(MAKE) -C emojivoto-web build-container
 	$(MAKE) -C emojivoto-emoji-svc build-container
