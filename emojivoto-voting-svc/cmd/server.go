@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
 
 	"contrib.go.opencensus.io/exporter/ocagent"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/trace"
@@ -22,9 +23,13 @@ import (
 )
 
 var (
-	grpcPort    = os.Getenv("GRPC_PORT")
-	promPort    = os.Getenv("PROM_PORT")
-	ocagentHost = os.Getenv("OC_AGENT_HOST")
+	grpcPort                = os.Getenv("GRPC_PORT")
+	promPort                = os.Getenv("PROM_PORT")
+	ocagentHost             = os.Getenv("OC_AGENT_HOST")
+	failureRateVar          = os.Getenv("FAILURE_RATE")
+	failureRateFloat        = float64(0.0)
+	artificialDelayVar      = os.Getenv("ARTIFICIAL_DELAY")
+	artificialDelayDuration = api.DurationZero
 )
 
 func main() {
@@ -70,9 +75,15 @@ func main() {
 			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
 		)
-		api.NewGrpServer(grpcServer, poll)
+
+		setFailureRateOrDefault(failureRateVar, &failureRateFloat)
+
+		setArtificialDelayOrDefault(artificialDelayVar, &artificialDelayDuration)
+
+		api.NewGrpServer(grpcServer, poll, float32(failureRateFloat), artificialDelayDuration)
 		grpc_prometheus.Register(grpcServer)
 		log.Printf("Starting grpc server on GRPC_PORT=[%s]", grpcPort)
+		log.Printf("Using failureRate [%f] and artificialDelayDuration [%v]", failureRateFloat, artificialDelayDuration)
 		err := grpcServer.Serve(lis)
 		errs <- err
 	}()
@@ -86,4 +97,28 @@ func main() {
 	}()
 
 	log.Fatal(<-errs)
+}
+
+func setFailureRateOrDefault(failureRateVar string, failureRateFloat *float64) {
+	if failureRateVar != "" {
+		var err error
+		*failureRateFloat, err = strconv.ParseFloat(failureRateVar, 32)
+		if err != nil {
+			log.Printf("Invalid value for FAILURE_RATE %v. Using %f instead", failureRateVar, *failureRateFloat)
+		}
+
+		if *failureRateFloat > 1.0 {
+			log.Printf("FAILURE_RATE is set to %f. It should be a value between 0.0 and 1.0", *failureRateFloat)
+		}
+	}
+}
+
+func setArtificialDelayOrDefault(artificialDelayVar string, artificialDelayDuration *time.Duration) {
+	if artificialDelayVar != "" {
+		var err error
+		*artificialDelayDuration, err = time.ParseDuration(artificialDelayVar)
+		if err != nil {
+			log.Printf("ParseDuration failed for %v using %v instead", artificialDelayVar, *artificialDelayDuration)
+		}
+	}
 }

@@ -3,23 +3,53 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
+	"math/rand"
+	"time"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-voting-svc/gen/proto"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
 	"google.golang.org/grpc"
 )
 
+var (
+	DurationZero, _ = time.ParseDuration("0ms")
+	FloatZero       = float32(0.0)
+)
+
 type PollServiceServer struct {
-	poll voting.Poll
+	poll                    voting.Poll
+	failureRate             float32
+	artificialDelayDuration time.Duration
 }
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
+
+	if pS.artificialDelayDuration > DurationZero {
+		// log.Printf("artificialDelayDuration %v is greater than 0", pS.artificialDelayDuration)
+		startTime := time.Now()
+		for time.Now().Sub(startTime).Milliseconds() < pS.artificialDelayDuration.Milliseconds() {
+			// do nothing
+		}
+	}
+
 	err := pS.poll.Vote(shortcode)
 	return &pb.VoteResponse{}, err
 }
 
 func (pS *PollServiceServer) VoteDoughnut(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
-	return nil, fmt.Errorf("ERROR")
+
+	if pS.failureRate > FloatZero {
+		probability := rand.Float32()
+
+		if probability < pS.failureRate {
+			log.Printf("probability [%f] is less than failureRate [%f]", probability, pS.failureRate)
+			log.Printf("logging an error for doughnut")
+			return nil, fmt.Errorf("ERROR")
+		}
+	}
+	log.Printf("voting for doughnut")
+	return pS.vote(":doughnut:")
 }
 
 func (pS *PollServiceServer) VotePoop(_ context.Context, _ *pb.VoteRequest) (*pb.VoteResponse, error) {
@@ -439,9 +469,11 @@ func (pS *PollServiceServer) Results(context.Context, *pb.ResultsRequest) (*pb.R
 	return response, nil
 }
 
-func NewGrpServer(grpcServer *grpc.Server, poll voting.Poll) {
+func NewGrpServer(grpcServer *grpc.Server, poll voting.Poll, failureRate float32, artificialDelayDuration time.Duration) {
 	server := &PollServiceServer{
 		poll,
+		failureRate,
+		artificialDelayDuration,
 	}
 
 	pb.RegisterVotingServiceServer(grpcServer, server)
