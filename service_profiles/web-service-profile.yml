@@ -13,3 +13,4 @@ spec:
       method: GET
       pathRegex: /api/vote
     name: GET /api/vote
+    isRetryable: true
