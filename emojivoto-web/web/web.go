@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
@@ -19,6 +20,7 @@ type WebApp struct {
 	votingServiceClient pb.VotingServiceClient
 	indexBundle         string
 	webpackDevServer    string
+	messageOfTheDay     string
 }
 
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
@@ -315,7 +317,7 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
-	indexTemplate := `
+	indexTemplate := fmt.Sprintf(`
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -332,6 +334,7 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 			</script>
 		</head>
 		<body>
+			<div id="motd" class="motd">%s</div>
 			<div id="main" class="main"></div>
 		</body>
 		{{ if ne . ""}}
@@ -339,7 +342,7 @@ func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
 		{{else}}
 			<script type="text/javascript" src="/js" async></script>
 		{{end}}
-	</html>`
+	</html>`, app.messageOfTheDay)
 	t, err := template.New("indexTemplate").Parse(indexTemplate)
 	if err != nil {
 		panic(err)
@@ -375,21 +378,24 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
-func handle(path string, h func (w http.ResponseWriter, r *http.Request)) {
-	http.Handle(path, &ochttp.Handler {
+func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
+	http.Handle(path, &ochttp.Handler{
 		Handler: http.HandlerFunc(h),
 	})
 }
 
 func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
+
+	motd := os.Getenv("MESSAGE_OF_THE_DAY")
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
 		votingServiceClient: votingClient,
 		indexBundle:         indexBundle,
 		webpackDevServer:    webpackDevServer,
+		messageOfTheDay:     motd,
 	}
 
-	log.Printf("Starting web server on WEB_PORT=[%s]", webPort)
+	log.Printf("Starting web server on WEB_PORT=[%s] and MESSAGE_OF_THE_DAY=[%s]", webPort, motd)
 	handle("/", webApp.indexHandler)
 	handle("/leaderboard", webApp.indexHandler)
 	handle("/js", webApp.jsHandler)
