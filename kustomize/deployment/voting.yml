@@ -12,18 +12,18 @@ metadata:
   labels:
     app.kubernetes.io/name: voting
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v10
+    app.kubernetes.io/version: v11
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: voting-svc
-      version: v10
+      version: v11
   template:
     metadata:
       labels:
         app: voting-svc
-        version: v10
+        version: v11
     spec:
       serviceAccountName: voting
       containers:
@@ -32,7 +32,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: buoyantio/emojivoto-voting-svc:v10
+        image: buoyantio/emojivoto-voting-svc:v11
         name: voting-svc
         ports:
         - containerPort: 8080
