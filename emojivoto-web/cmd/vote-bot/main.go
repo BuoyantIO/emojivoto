@@ -41,6 +41,8 @@ func main() {
 		log.Fatalf("WEB_HOST environment variable must me set")
 	}
 
+	hostOverride := os.Getenv("HOST_OVERRIDE")
+
 	oce, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
 		ocagent.WithReconnectionPeriod(5*time.Second),
@@ -52,8 +54,8 @@ func main() {
 	trace.RegisterExporter(oce)
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
-	webUrl := "http://" + webHost
-	if _, err := url.Parse(webUrl); err != nil {
+	webURL := "http://" + webHost
+	if _, err := url.Parse(webURL); err != nil {
 		log.Fatalf("WEB_HOST %s is invalid", webHost)
 	}
 
@@ -61,7 +63,7 @@ func main() {
 		time.Sleep(time.Second)
 
 		// Get the list of available shortcodes
-		shortcodes, err := shortcodes(webUrl)
+		shortcodes, err := shortcodes(webURL, hostOverride)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			continue
@@ -71,10 +73,10 @@ func main() {
 		probability := rand.Float32()
 		switch {
 		case probability < 0.15:
-			err = vote(webUrl, ":doughnut:")
+			err = vote(webURL, hostOverride, ":doughnut:")
 		default:
 			random := shortcodes[rand.Intn(len(shortcodes))]
-			err = vote(webUrl, random)
+			err = vote(webURL, hostOverride, random)
 		}
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
@@ -82,10 +84,13 @@ func main() {
 	}
 }
 
-func shortcodes(webUrl string) ([]string, error) {
-	url := fmt.Sprintf("%s/api/list", webUrl)
-
-	resp, err := client.Get(url)
+func shortcodes(webURL string, hostOverride string) ([]string, error) {
+	url := fmt.Sprintf("%s/api/list", webURL)
+	req, _ := http.NewRequest("GET", url, nil)
+	if hostOverride != "" {
+		req.Host = hostOverride
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -110,11 +115,15 @@ func shortcodes(webUrl string) ([]string, error) {
 	return shortcodes, nil
 }
 
-func vote(webUrl string, shortcode string) error {
+func vote(webURL string, hostOverride string, shortcode string) error {
 	fmt.Printf("✔ Voting for %s\n", shortcode)
-	url := fmt.Sprintf("%s/api/vote?choice=%s", webUrl, shortcode)
 
-	resp, err := client.Get(url)
+	url := fmt.Sprintf("%s/api/vote?choice=%s", webURL, shortcode)
+	req, _ := http.NewRequest("GET", url, nil)
+	if hostOverride != "" {
+		req.Host = hostOverride
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
