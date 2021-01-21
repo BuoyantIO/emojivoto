@@ -32,7 +32,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: buoyantio/emojivoto-voting-svc:v11
+        image: docker.l5d.io/buoyantio/emojivoto-voting-svc:v11
         name: voting-svc
         ports:
         - containerPort: 8080
