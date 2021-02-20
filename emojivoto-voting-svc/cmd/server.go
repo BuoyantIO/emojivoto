@@ -23,13 +23,13 @@ import (
 )
 
 var (
-	grpcPort                = os.Getenv("GRPC_PORT")
-	promPort                = os.Getenv("PROM_PORT")
-	ocagentHost             = os.Getenv("OC_AGENT_HOST")
-	failureRateVar          = os.Getenv("FAILURE_RATE")
-	failureRateFloat        = float64(0.0)
-	artificialDelayVar      = os.Getenv("ARTIFICIAL_DELAY")
-	artificialDelayDuration = api.DurationZero
+	grpcPort                   = os.Getenv("GRPC_PORT")
+	promPort                   = os.Getenv("PROM_PORT")
+	ocagentHost                = os.Getenv("OC_AGENT_HOST")
+	failureRateVar             = os.Getenv("FAILURE_RATE")
+	failureRateFloat           = float64(0.0)
+	artificialDelayVar         = os.Getenv("ARTIFICIAL_DELAY")
+	artificialDelayDuration, _ = time.ParseDuration("0ms")
 )
 
 func main() {

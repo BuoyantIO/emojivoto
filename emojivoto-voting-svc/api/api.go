@@ -13,8 +13,7 @@ import (
 )
 
 var (
-	DurationZero, _ = time.ParseDuration("0ms")
-	FloatZero       = float32(0.0)
+	FloatZero = float32(0.0)
 )
 
 type PollServiceServer struct {
@@ -25,13 +24,7 @@ type PollServiceServer struct {
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
 
-	if pS.artificialDelayDuration > DurationZero {
-		// log.Printf("artificialDelayDuration %v is greater than 0", pS.artificialDelayDuration)
-		startTime := time.Now()
-		for time.Now().Sub(startTime).Milliseconds() < pS.artificialDelayDuration.Milliseconds() {
-			// do nothing
-		}
-	}
+	time.Sleep(pS.artificialDelayDuration)
 
 	err := pS.poll.Vote(shortcode)
 	return &pb.VoteResponse{}, err
