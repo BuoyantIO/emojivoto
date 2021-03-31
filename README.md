@@ -132,13 +132,31 @@ This can be disabled by unsetting the `PROM_PORT` environment variable.
 
 ### Emojivoto webapp
 
+#### Requirements
+1. Set your `GOPATH`
+```shell
+   export GOPATH=/path/to/go
+```
+2. Add your `GOPATH/bin` to the `PATH`
+```shell
+   export PATH=$PATH:$GOPATH/bin
+```
+3. Install protobuf compiler: https://grpc.io/docs/protoc-installation/
+4. Install go packages
+```shell
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get google.golang.org/protobuf/reflect/protoreflect@v1.26.0
+go get google.golang.org/protobuf/runtime/protoimpl@v1.26.0
+```
+5. Install yarn: https://classic.yarnpkg.com/en/docs/install/
+#### Building process
 This app is written with React and bundled with webpack.
 Use the following to run the emojivoto go services and develop on the frontend.
 
 Set up proto files, build apps
 
 ```bash
-make build
+make local
 ```
 
 Start the voting service

@@ -16,7 +16,18 @@ emoji-svc:
 voting-svc:
 	$(MAKE) -C emojivoto-voting-svc
 
+emoji-svc-local:
+	$(MAKE) -C emojivoto-emoji-svc local
+
+voting-svc-local:
+	$(MAKE) -C emojivoto-voting-svc local
+
+web-local:
+	$(MAKE) -C emojivoto-web local
+
 build: web emoji-svc voting-svc
+
+local: web-local emoji-svc-local voting-svc-local
 
 multi-arch:
 	$(MAKE) -C emojivoto-web build-multi-arch
