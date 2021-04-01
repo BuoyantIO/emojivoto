@@ -81,31 +81,7 @@ export default class Vote extends React.Component {
   }
 
   render() {
-    if (this.state.error) {
-      let errorMessage = <p>We couldn't process your request.</p>;
-      if(this.state.selectedEmoji.shortcode === ":doughnut:") {
-        errorMessage = (<div>
-          <p className="doughnut-explanation">For the sake of this demo, voting for 🍩<br />
-            always returns an error.
-          </p>
-          <p><Link to="/" onClick={this.resetState}>Pick another</Link>!</p>
-        </div>);
-      }
-
-      let contents = (
-        <div>
-          {errorMessage}
-          <Link to="/" onClick={this.resetState}><div className="btn btn-blue">Select again</div></Link>
-        </div>
-      );
-
-      return <EmojiVotoPage
-        preHeadline={<h1 className="title">404</h1>}
-        headline="🚧"
-        contents={contents}
-        containerClass="background-500"
-      />;
-    } else if (!this.state.selectedEmoji) {
+    if (!this.state.selectedEmoji) {
       let emojiList = this.state.emojiList;
       let contents = (
         <div>
