@@ -4,3 +4,4 @@ resources:
 - emoji.yml
 - voting.yml
 - vote-bot.yml
+- web-app.yml

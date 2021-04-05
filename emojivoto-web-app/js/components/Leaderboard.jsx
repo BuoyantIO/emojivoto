@@ -16,7 +16,7 @@ export default class Leaderboard extends React.Component {
   }
 
   loadFromServer(emoji) {
-    fetch('/api/leaderboard').then(r => {
+    fetch( `${process.env.API_URL}/api/leaderboard`).then(r => {
       r.json().then(emojis => {
         this.setState({
           leaderboard: emojis

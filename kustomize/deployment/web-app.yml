@@ -1,45 +1,46 @@
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  name: web
+  name: web-app
   namespace: emojivoto
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: web-app
   namespace: emojivoto
   labels:
-    app.kubernetes.io/name: web
+    app.kubernetes.io/name: web-app
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
+    app.kubernetes.io/version: v0
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web-svc
-      version: v11
+      app: web-app
+      version: v0
   template:
     metadata:
       labels:
-        app: web-svc
-        version: v11
+        app: web-app
+        version: v0
     spec:
-      serviceAccountName: web
+      serviceAccountName: web-app
       containers:
       - env:
         - name: WEB_PORT
-          value: "8080"
+          value: "80"
         - name: EMOJISVC_HOST
           value: emoji-svc.emojivoto:8080
         - name: VOTINGSVC_HOST
           value: voting-svc.emojivoto:8080
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: docker.io/datawire/emojivoto-web:v0
-        name: web-svc
+        image: docker.io/datawire/emojivoto-web-app:v0
+        imagePullPolicy: Always
+        name: web-app
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           name: http
         resources:
           requests:
@@ -48,13 +49,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-svc
+  name: web-app
   namespace: emojivoto
 spec:
   type: ClusterIP
   selector:
-    app: web-svc
+    app: web-app
   ports:
   - name: http
-    port: 8080
-    targetPort: 8080
+    port: 80
+    targetPort: 80

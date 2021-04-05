@@ -5,10 +5,13 @@ include ./common.mk
 all: build integration-tests
 
 build-base-docker-image:
-	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:$(IMAGE_TAG)"
+	docker build . -f Dockerfile-base -t "datawire/emojivoto-svc-base:$(IMAGE_TAG)"
 
 web:
 	$(MAKE) -C emojivoto-web
+
+web-app:
+	$(MAKE) -C emojivoto-web-app
 
 emoji-svc:
 	$(MAKE) -C emojivoto-emoji-svc
@@ -25,9 +28,14 @@ voting-svc-local:
 web-local:
 	$(MAKE) -C emojivoto-web local
 
-build: web emoji-svc voting-svc
+web-app-local:
+	$(MAKE) -C emojivoto-web-app local
 
-local: web-local emoji-svc-local voting-svc-local
+build: web web-app emoji-svc voting-svc
+
+build-ui: build-container-ui
+
+local: web-local web-app-local emoji-svc-local voting-svc-local
 
 multi-arch:
 	$(MAKE) -C emojivoto-web build-multi-arch

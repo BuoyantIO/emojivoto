@@ -1,8 +1,28 @@
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require('webpack');
 const path = require('path');
+const dotenv = require('dotenv').config( {
+  path: path.join(__dirname, '.env')
+} );
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './js/index.js',
+  plugins:
+    [
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, "index.html")
+      }),
+      new webpack.DefinePlugin( {
+        "process.env": dotenv.parsed
+      } ),
+
+    ],
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 8080,
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: 'dist/',

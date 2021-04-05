@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,11 +15,10 @@ import (
 type WebApp struct {
 	emojiServiceClient  pb.EmojiServiceClient
 	votingServiceClient pb.VotingServiceClient
-	indexBundle         string
-	webpackDevServer    string
 }
 
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	serviceResponse, err := app.emojiServiceClient.ListAll(r.Context(), &pb.ListAllEmojiRequest{})
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
@@ -44,6 +41,7 @@ func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	results, err := app.votingServiceClient.Results(r.Context(), &pb.ResultsRequest{})
 
 	if err != nil {
@@ -82,6 +80,7 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	emojiShortcode := r.FormValue("choice")
+	enableCors(&w)
 	if emojiShortcode == "" {
 		error := errors.New(fmt.Sprintf("Emoji choice [%s] is mandatory", emojiShortcode))
 		writeError(error, w, r, http.StatusBadRequest)
@@ -312,50 +311,6 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *WebApp) indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-
-	indexTemplate := `
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8">
-			<title>Emoji Vote</title>
-			<link rel="icon" href="/img/favicon.ico">
-			<!-- Global site tag (gtag.js) - Google Analytics -->
-			<script async src="https://www.googletagmanager.com/gtag/js?id=UA-60040560-4"></script>
-			<script>
-			  window.dataLayer = window.dataLayer || [];
-			  function gtag(){dataLayer.push(arguments);}
-			  gtag('js', new Date());
-			  gtag('config', 'UA-60040560-4');
-			</script>
-		</head>
-		<body>
-			<div id="main" class="main"></div>
-		</body>
-		{{ if ne . ""}}
-			<script type="text/javascript" src="{{ . }}/dist/index_bundle.js" async></script>
-		{{else}}
-			<script type="text/javascript" src="/js" async></script>
-		{{end}}
-	</html>`
-	t, err := template.New("indexTemplate").Parse(indexTemplate)
-	if err != nil {
-		panic(err)
-	}
-	t.Execute(w, app.webpackDevServer)
-}
-
-func (app *WebApp) jsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/javascript")
-	f, err := ioutil.ReadFile(app.indexBundle)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprint(w, string(f))
-}
-
 func (app *WebApp) faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/favicon.ico")
 }
@@ -375,31 +330,26 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 	json.NewEncoder(w).Encode(errorMessage)
 }
 
-func handle(path string, h func (w http.ResponseWriter, r *http.Request)) {
-	http.Handle(path, &ochttp.Handler {
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
+	http.Handle(path, &ochttp.Handler{
 		Handler: http.HandlerFunc(h),
 	})
 }
 
-func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
+func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
 		votingServiceClient: votingClient,
-		indexBundle:         indexBundle,
-		webpackDevServer:    webpackDevServer,
 	}
 
 	log.Printf("Starting web server on WEB_PORT=[%s]", webPort)
-	handle("/", webApp.indexHandler)
-	handle("/leaderboard", webApp.indexHandler)
-	handle("/js", webApp.jsHandler)
-	handle("/img/favicon.ico", webApp.faviconHandler)
 	handle("/api/list", webApp.listEmojiHandler)
 	handle("/api/vote", webApp.voteEmojiHandler)
 	handle("/api/leaderboard", webApp.leaderboardHandler)
-
-	// TODO: make static assets dir configurable
-	http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", webPort), nil)
 	if err != nil {
