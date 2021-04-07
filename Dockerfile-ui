@@ -4,3 +4,4 @@ ARG svc_name
 
 COPY $svc_name/dist/index.html /usr/share/nginx/html/index.html
 COPY $svc_name/dist/index_bundle.js /usr/share/nginx/html/
+COPY web-app-nginx.conf /etc/nginx/conf.d/default.conf
