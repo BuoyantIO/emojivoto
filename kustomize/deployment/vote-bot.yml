@@ -6,18 +6,18 @@ metadata:
   labels:
     app.kubernetes.io/name: vote-bot
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v10
+    app.kubernetes.io/version: v11
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: vote-bot
-      version: v10
+      version: v11
   template:
     metadata:
       labels:
         app: vote-bot
-        version: v10
+        version: v11
     spec:
       containers:
       - command:
@@ -25,7 +25,7 @@ spec:
         env:
         - name: WEB_HOST
           value: web-svc.emojivoto:80
-        image: buoyantio/emojivoto-web:v10
+        image: docker.l5d.io/buoyantio/emojivoto-web:v11
         name: vote-bot
         resources:
           requests:
