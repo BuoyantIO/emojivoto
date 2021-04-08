@@ -20,8 +20,15 @@ module.exports = {
     ],
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
+    watchContentBase: true,
     compress: true,
+    disableHostCheck: true,
     port: 8080,
+    historyApiFallback: {
+      rewrites: [
+        {from: /^\/leaderboard/, to: 'index.html'},
+      ]
+    },
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
