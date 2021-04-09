@@ -8,6 +8,7 @@ const dotenv = require('dotenv').config( {
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './js/index.js',
+  cache: false,
   plugins:
     [
       new HtmlWebpackPlugin({
