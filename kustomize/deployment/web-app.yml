@@ -2,11 +2,13 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: web-app
+  namespace: emojivoto
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web-app
+  namespace: emojivoto
   labels:
     app.kubernetes.io/name: web-app
     app.kubernetes.io/part-of: emojivoto
@@ -48,6 +50,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-app
+  namespace: emojivoto
 spec:
   type: ClusterIP
   selector:

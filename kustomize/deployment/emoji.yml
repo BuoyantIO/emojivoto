@@ -2,11 +2,13 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: emoji
+  namespace: emojivoto
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: emoji
+  namespace: emojivoto
   labels:
     app.kubernetes.io/name: emoji
     app.kubernetes.io/part-of: emojivoto
@@ -45,6 +47,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: emoji-svc
+  namespace: emojivoto
 spec:
   selector:
     app: emoji-svc
