@@ -1,0 +1,16 @@
+apiVersion: split.smi-spec.io/v1alpha1
+kind: TrafficSplit
+metadata:
+  name: web-svc-ts
+  namespace: emojivoto
+spec:
+  # The root service that clients use to connect to the destination application.
+  service: web-apex
+  # Services inside the namespace with their own selectors, endpoints and configuration.
+  backends:
+  - service: web-svc
+    # Identical to resources, 1 = 1000m
+    weight: 250m
+  - service: web-svc-2
+    weight: 750m
+  

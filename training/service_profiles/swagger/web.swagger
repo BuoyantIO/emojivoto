@@ -1,0 +1,7 @@
+openapi: 3.0.1
+version: v10
+paths:
+  /api/list:
+    get: {}
+  /api/vote:
+    get: {}

@@ -1,4 +1,4 @@
-export IMAGE_TAG := v11
+IMAGE_TAG ?= v12
 
 .PHONY: package protoc test
 
