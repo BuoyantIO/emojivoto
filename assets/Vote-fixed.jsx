@@ -85,8 +85,8 @@ export default class Vote extends React.Component {
       let errorMessage = <p>We couldn't process your request.</p>;
       if(this.state.selectedEmoji.shortcode === ":doughnut:") {
         errorMessage = (<div>
-          <p className="doughnut-explanation">For the sake of this demo, voting for 🍩<br />
-            always returns an error.
+          <p className="doughnut-explanation">Sorry, currently unable to vote for 🍩.<br />
+            Please go back and choose another emoji.
           </p>
           <p><Link to="/" onClick={this.resetState}>Pick another</Link>!</p>
         </div>);
