@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: web
+  namespace: emojivoto
+spec:
+  prefix: /api/
+  rewrite: /api/
+  resolver: endpoint
+  service: web-svc:8080

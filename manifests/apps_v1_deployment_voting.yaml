@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: voting-svc
     app.kubernetes.io/name: voting
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
   name: voting
   namespace: emojivoto
 spec:
@@ -12,12 +12,12 @@ spec:
   selector:
     matchLabels:
       app: voting-svc
-      version: v11
   template:
     metadata:
       labels:
         app: voting-svc
-        version: v11
+        app.kubernetes.io/name: voting
+        app.kubernetes.io/part-of: emojivoto
     spec:
       containers:
       - env:
@@ -25,7 +25,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: docker.l5d.io/buoyantio/emojivoto-voting-svc:v11
+        image: datawire/emojivoto-voting-svc:v11
         name: voting-svc
         ports:
         - containerPort: 8080

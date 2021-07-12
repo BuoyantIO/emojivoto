@@ -12,12 +12,10 @@ spec:
   selector:
     matchLabels:
       app: emoji-svc
-      version: v11
   template:
     metadata:
       labels:
         app: emoji-svc
-        version: v11
     spec:
       containers:
       - env:
@@ -25,7 +23,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: docker.l5d.io/buoyantio/emojivoto-emoji-svc:v11
+        image: datawire/emojivoto-emoji-svc:v11
         name: emoji-svc
         ports:
         - containerPort: 8080
