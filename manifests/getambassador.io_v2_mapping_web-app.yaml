@@ -1,0 +1,9 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: web-app
+  namespace: emojivoto
+spec:
+  prefix: /
+  resolver: endpoint
+  service: web-app:80

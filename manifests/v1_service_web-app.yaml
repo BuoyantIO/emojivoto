@@ -3,6 +3,24 @@ kind: Service
 metadata:
   name: web-app
   namespace: emojivoto
+  annotations:
+    a8r.io/bugs: https://github.com/datawire/emojivoto/issues
+    a8r.io/chat: https://datawire.slack.com/team/U0120PU7P7S
+    a8r.io/dependencies: emoji-svc.emojivoto, voting-svc.emojivoto
+    a8r.io/description: Emojivoto web application for voting and leaderboard
+    a8r.io/documentation: https://www.getambassador.io/docs/latest/
+    a8r.io/incidents: https://app.datadoghq.com/incidents/settings
+    a8r.io/logs: https://app.datadoghq.com/logs/activation
+    a8r.io/performance: https://aes-demo.com/jaeger/search?end=1625056709148000&limit=20&lookback=1h&maxDuration&minDuration&service=productcatalogservice&start=1625053109148000
+    a8r.io/repository: https://github.com/datawire/emojivoto
+    a8r.io/rollouts.deployment: web
+    a8r.io/rollouts.image-repo.name: datawire/emojivoto-web-app
+    a8r.io/rollouts.image-repo.type: dockerhub
+    a8r.io/rollouts.mappings: emojivoto-mapping
+    a8r.io/rollouts.scm.branch: main
+    a8r.io/rollouts.scm.path: manifests
+    a8r.io/runbook: https://www.getambassador.io/docs/latest/topics/running/debugging/
+    a8r.io/support: https://support.datawire.io/hc/en-us
 spec:
   ports:
   - name: http
