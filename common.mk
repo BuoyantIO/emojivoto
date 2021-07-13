@@ -1,4 +1,4 @@
-export IMAGE_TAG := v0
+export IMAGE_TAG := v11
 
 .PHONY: package protoc test
 
@@ -25,7 +25,7 @@ build-multi-arch:
 		-f ../Dockerfile-multi-arch --platform linux/amd64,linux/arm64,linux/arm/v7 --push
 
 build-container-ui:
-	docker build .. -t "datawire/$(svc_name):$(IMAGE_TAG)" --build-arg svc_name=$(svc_name) -f ../Dockerfile-ui
+	docker build .. -t "datawire/emojivoto-web-app:$(IMAGE_TAG)" --build-arg svc_name=emojivoto-web-app -f ../Dockerfile-ui
 
 compile:
 	GOOS=linux go build -v -o $(target_dir)/$(svc_name) cmd/server.go

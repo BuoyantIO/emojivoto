@@ -58,6 +58,6 @@ deploy-to-docker-compose:
 	docker-compose -f ./docker-compose.yml up -d
 
 push-%:
-	docker push buoyantio/emojivoto-$*:$(IMAGE_TAG)
+	docker push datawire/emojivoto-$*:$(IMAGE_TAG)
 
-push: push-svc-base push-emoji-svc push-voting-svc push-web
+push: push-svc-base push-emoji-svc push-voting-svc push-web push-web-app

@@ -31,7 +31,7 @@ export default class Vote extends React.Component {
   }
 
   loadFromServer() {
-    fetch(`${process.env.API_URL}/api/list`).then(rsp => {
+    fetch(`/api/list`).then(rsp => {
       rsp.json().then(r => {
         this.setState({ emojiList: r })
       }).catch(e => {
@@ -47,7 +47,7 @@ export default class Vote extends React.Component {
   }
 
   vote(emoji) {
-    fetch(`${process.env.API_URL}/api/vote?choice=${emoji.shortcode}`).then(rsp => {
+    fetch(`/api/vote?choice=${emoji.shortcode}`).then(rsp => {
       if (rsp.ok) {
         this.setState({ selectedEmoji: emoji, error: null });
       } else {
