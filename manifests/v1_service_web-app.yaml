@@ -13,10 +13,10 @@ metadata:
     a8r.io/logs: https://app.datadoghq.com/logs/activation
     a8r.io/performance: https://aes-demo.com/jaeger/search?end=1625056709148000&limit=20&lookback=1h&maxDuration&minDuration&service=productcatalogservice&start=1625053109148000
     a8r.io/repository: https://github.com/datawire/emojivoto
-    a8r.io/rollouts.deployment: web
+    a8r.io/rollouts.deployment: web-app
     a8r.io/rollouts.image-repo.name: datawire/emojivoto-web-app
     a8r.io/rollouts.image-repo.type: dockerhub
-    a8r.io/rollouts.mappings: emojivoto-mapping
+    a8r.io/rollouts.mappings: web-app
     a8r.io/rollouts.scm.branch: main
     a8r.io/rollouts.scm.path: manifests
     a8r.io/runbook: https://www.getambassador.io/docs/latest/topics/running/debugging/
