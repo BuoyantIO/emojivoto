@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v2
+kind: Host
+metadata:
+  name: default
+spec:
+  acmeProvider:
+    authority: none
+  requestPolicy:
+    insecure:
+      action: Route
