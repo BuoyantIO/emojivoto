@@ -46,10 +46,6 @@ export default class Leaderboard extends React.Component {
               <h1>EMOJI VOTE LEADERBOARD </h1>
               <Link to="/"><div className="btn btn-blue">Vote on your favorite</div></Link>
               <div className="emoji-list">{this.renderLeaderboard()}
-                <div className="footer-text">
-                  <p className="footer-experiment">A <a href='https://buoyant.io'>Buoyant</a> social experiment</p>
-                  <p>© 2018 Buoyant, Inc. All Rights Reserved.</p>
-                </div>
               </div>
             </div>
           </div>
