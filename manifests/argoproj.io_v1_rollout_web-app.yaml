@@ -27,6 +27,7 @@ spec:
     metadata:
       labels:
         app: web-app
+        revision: 2021-07-29.01
     spec:
       containers:
       - env:
