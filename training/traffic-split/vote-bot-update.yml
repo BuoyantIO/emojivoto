@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: vote-bot
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v10
+    app.kubernetes.io/version: v11
   name: vote-bot
   namespace: emojivoto
 spec:
@@ -12,12 +12,12 @@ spec:
   selector:
     matchLabels:
       app: vote-bot
-      version: v10
+      version: v1
   template:
     metadata:
       labels:
         app: vote-bot
-        version: v10
+        version: v11
     spec:
       containers:
       - command:
@@ -25,7 +25,7 @@ spec:
         env:
         - name: WEB_HOST
           value: web-apex.emojivoto:80
-        image: buoyantio/emojivoto-web:v10
+        image: buoyantio/emojivoto-web:v11
         name: vote-bot
         resources:
           requests:
