@@ -1,9 +1,12 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"log"
 	"net/http"
 	"strconv"
@@ -78,6 +81,20 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type telepresenceIdHeader struct {}
+
+func TelepresenceInterceptIdInterceptor (ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	value, ok := ctx.Value(telepresenceIdHeader{}).(string)
+	if ok {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if ok {
+			md["x-telepresence-intercept-id"] = []string{value}
+		}
+		metadata.NewOutgoingContext(ctx, md)
+	}
+	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	emojiShortcode := r.FormValue("choice")
 	enableCors(&w)
@@ -102,10 +119,12 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := context.WithValue(r.Context(), telepresenceIdHeader{}, r.Header.Get("x-telepresence-intercept-id"))
+
 	voteRequest := &pb.VoteRequest{}
 	switch emojiShortcode {
 	case ":poop:":
-		_, err = app.votingServiceClient.VotePoop(r.Context(), voteRequest)
+		_, err = app.votingServiceClient.VotePoop(ctx, voteRequest)
 	case ":joy:":
 		_, err = app.votingServiceClient.VoteJoy(r.Context(), voteRequest)
 	case ":sunglasses:":
