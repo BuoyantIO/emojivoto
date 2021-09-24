@@ -4,7 +4,7 @@ metadata:
   labels:
     app.kubernetes.io/name: emoji
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
+    app.kubernetes.io/version: v11.1
   name: emoji
   namespace: emojivoto
 spec:
@@ -23,7 +23,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: datawire/emojivoto-emoji-svc:v11
+        image: datawire/emojivoto-emoji-svc:v11.1
         name: emoji-svc
         ports:
         - containerPort: 8080

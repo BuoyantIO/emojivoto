@@ -26,7 +26,7 @@ spec:
           value: voting-svc:8080
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: datawire/emojivoto-web:v11
+        image: datawire/emojivoto-web:v11.1
         name: web-svc
         ports:
         - containerPort: 8080
