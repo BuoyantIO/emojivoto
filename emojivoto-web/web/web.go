@@ -21,9 +21,26 @@ type WebApp struct {
 	votingServiceClient pb.VotingServiceClient
 }
 
+type telepresenceIdHeader struct{}
+
+const telepresenceInterceptHeaderName = "x-telepresence-intercept-id"
+
+func addTelepresenceIdHeader(r *http.Request) context.Context {
+	return context.WithValue(r.Context(), telepresenceIdHeader{}, r.Header.Get("x-telepresence-intercept-id"))
+}
+
+func TelepresenceInterceptIdInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	value, ok := ctx.Value(telepresenceIdHeader{}).(string)
+	if ok {
+		ctx = metadata.AppendToOutgoingContext(ctx, telepresenceInterceptHeaderName, value)
+	}
+	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
 func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := addTelepresenceIdHeader(r)
 	enableCors(&w)
-	serviceResponse, err := app.emojiServiceClient.ListAll(r.Context(), &pb.ListAllEmojiRequest{})
+	serviceResponse, err := app.emojiServiceClient.ListAll(ctx, &pb.ListAllEmojiRequest{})
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
 		return
@@ -45,8 +62,9 @@ func (app *WebApp) listEmojiHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := addTelepresenceIdHeader(r)
 	enableCors(&w)
-	results, err := app.votingServiceClient.Results(r.Context(), &pb.ResultsRequest{})
+	results, err := app.votingServiceClient.Results(ctx, &pb.ResultsRequest{})
 
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
@@ -59,7 +77,7 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 			Shortcode: result.Shortcode,
 		}
 
-		findByShortcodeResponse, err := app.emojiServiceClient.FindByShortcode(r.Context(), findByShortcodeRequest)
+		findByShortcodeResponse, err := app.emojiServiceClient.FindByShortcode(ctx, findByShortcodeRequest)
 
 		if err != nil {
 			writeError(err, w, r, http.StatusInternalServerError)
@@ -82,19 +100,8 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type telepresenceIdHeader struct{}
-
-const telepresenceInterceptHeaderName = "x-telepresence-intercept-id"
-
-func TelepresenceInterceptIdInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	value, ok := ctx.Value(telepresenceIdHeader{}).(string)
-	if ok {
-		ctx = metadata.AppendToOutgoingContext(ctx, telepresenceInterceptHeaderName, value)
-	}
-	return invoker(ctx, method, req, reply, cc, opts...)
-}
-
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := addTelepresenceIdHeader(r)
 	emojiShortcode := r.FormValue("choice")
 	enableCors(&w)
 	if emojiShortcode == "" {
@@ -106,7 +113,7 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	request := &pb.FindByShortcodeRequest{
 		Shortcode: emojiShortcode,
 	}
-	response, err := app.emojiServiceClient.FindByShortcode(r.Context(), request)
+	response, err := app.emojiServiceClient.FindByShortcode(ctx, request)
 	if err != nil {
 		writeError(err, w, r, http.StatusInternalServerError)
 		return
@@ -117,8 +124,6 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(err, w, r, http.StatusBadRequest)
 		return
 	}
-
-	ctx := context.WithValue(r.Context(), telepresenceIdHeader{}, r.Header.Get("x-telepresence-intercept-id"))
 
 	voteRequest := &pb.VoteRequest{}
 	switch emojiShortcode {
