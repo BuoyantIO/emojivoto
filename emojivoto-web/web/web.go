@@ -84,10 +84,12 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 
 type telepresenceIdHeader struct{}
 
+const telepresenceInterceptHeaderName = "x-telepresence-intercept-id"
+
 func TelepresenceInterceptIdInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	value, ok := ctx.Value(telepresenceIdHeader{}).(string)
 	if ok {
-		ctx = metadata.AppendToOutgoingContext(ctx, "x-telepresence-intercept-id", value)
+		ctx = metadata.AppendToOutgoingContext(ctx, telepresenceInterceptHeaderName, value)
 	}
 	return invoker(ctx, method, req, reply, cc, opts...)
 }
