@@ -27,7 +27,7 @@ spec:
     metadata:
       labels:
         app: web-app
-        revision: 2021-08-25.01
+        revision: 2021-09-23.01
     spec:
       containers:
       - env:
@@ -35,7 +35,7 @@ spec:
           value: "80"
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: datawire/emojivoto-web-app:v11
+        image: datawire/emojivoto-web-app:v11.1
         imagePullPolicy: Always
         name: web-app
         ports:

@@ -1,4 +1,4 @@
-FROM datawire/emojivoto-svc-base:v11
+FROM datawire/emojivoto-svc-base:v11.1
 
 ARG svc_name
 

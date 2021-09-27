@@ -52,7 +52,8 @@ func openGrpcClientConnection(host string) *grpc.ClientConn {
 	conn, err := grpc.Dial(
 		host,
 		grpc.WithInsecure(),
-		grpc.WithStatsHandler(new(ocgrpc.ClientHandler)))
+		grpc.WithStatsHandler(new(ocgrpc.ClientHandler)),
+		grpc.WithUnaryInterceptor(web.TelepresenceInterceptIdInterceptor))
 
 	if err != nil {
 		panic(err)
