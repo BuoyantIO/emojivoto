@@ -6,18 +6,24 @@ metadata:
   labels:
     app.kubernetes.io/name: vote-bot
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
+    app.kubernetes.io/version: v13
+    tags.datadoghq.com/env: staging
+    tags.datadoghq.com/service: vote-bot
+    tags.datadoghq.com/version: v13
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: vote-bot
-      version: v11
+      version: v13
   template:
     metadata:
       labels:
         app: vote-bot
-        version: v11
+        version: v13
+        tags.datadoghq.com/env: staging
+        tags.datadoghq.com/service: vote-bot
+        tags.datadoghq.com/version: v13
     spec:
       containers:
       - command:
@@ -25,7 +31,23 @@ spec:
         env:
         - name: WEB_HOST
           value: web-svc.emojivoto:80
-        image: docker.l5d.io/buoyantio/emojivoto-web:v11
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        image: ouhhhhcrab/emojivoto-web:v13
         name: vote-bot
         resources:
           requests:

@@ -11,15 +11,15 @@ import (
 	"syscall"
 	"time"
 
+	"contrib.go.opencensus.io/exporter/ocagent"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/api"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
-
-	"contrib.go.opencensus.io/exporter/ocagent"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 var (
@@ -33,7 +33,11 @@ var (
 )
 
 func main() {
-
+	tracer.Start(
+		tracer.WithEnv("staging"),
+		tracer.WithService("voting"),
+		tracer.WithServiceVersion("V13"),
+	)
 	if grpcPort == "" {
 		log.Fatalf("GRPC_PORT (currently [%s]) environment variable must me set to run the server.", grpcPort)
 	}
@@ -97,6 +101,7 @@ func main() {
 	}()
 
 	log.Fatal(<-errs)
+	defer tracer.Stop()
 }
 
 func setFailureRateOrDefault(failureRateVar string, failureRateFloat *float64) {

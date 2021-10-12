@@ -13,6 +13,7 @@ import (
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
 	"go.opencensus.io/plugin/ochttp"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 type WebApp struct {
@@ -385,7 +386,11 @@ func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
 }
 
 func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
-
+	tracer.Start(
+		tracer.WithEnv("staging"),
+		tracer.WithService("web"),
+		tracer.WithServiceVersion("V13"),
+	)
 	motd := os.Getenv("MESSAGE_OF_THE_DAY")
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
@@ -411,4 +416,5 @@ func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClie
 	if err != nil {
 		panic(err)
 	}
+	defer tracer.Stop()
 }

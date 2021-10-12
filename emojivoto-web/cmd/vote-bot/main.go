@@ -14,6 +14,7 @@ import (
 	"contrib.go.opencensus.io/exporter/ocagent"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/trace"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // VoteBot votes for emoji! :ballot_box_with_check:
@@ -34,6 +35,11 @@ type emoji struct {
 }
 
 func main() {
+	tracer.Start(
+		tracer.WithEnv("prod"),
+		tracer.WithService("vote-bot"),
+		tracer.WithServiceVersion("V13"),
+	)
 	rand.Seed(time.Now().UnixNano())
 
 	webHost := os.Getenv("WEB_HOST")
@@ -82,6 +88,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
 	}
+	defer tracer.Stop()
 }
 
 func shortcodes(webURL string, hostOverride string) ([]string, error) {

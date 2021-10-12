@@ -12,18 +12,24 @@ metadata:
   labels:
     app.kubernetes.io/name: voting
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
+    app.kubernetes.io/version: v13
+    tags.datadoghq.com/env: staging
+    tags.datadoghq.com/service: voting
+    tags.datadoghq.com/version: v13
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: voting-svc
-      version: v11
+      version: v13
   template:
     metadata:
       labels:
         app: voting-svc
-        version: v11
+        version: v13
+        tags.datadoghq.com/env: staging
+        tags.datadoghq.com/service: voting
+        tags.datadoghq.com/version: v13
     spec:
       serviceAccountName: voting
       containers:
@@ -32,7 +38,23 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: docker.l5d.io/buoyantio/emojivoto-voting-svc:v11
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        image: ouhhhhcrab/emojivoto-voting-svc:v13
         name: voting-svc
         ports:
         - containerPort: 8080

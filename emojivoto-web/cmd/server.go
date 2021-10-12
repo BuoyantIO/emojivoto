@@ -5,12 +5,13 @@ import (
 	"os"
 	"time"
 
+	"contrib.go.opencensus.io/exporter/ocagent"
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
 	"github.com/buoyantio/emojivoto/emojivoto-web/web"
-	"google.golang.org/grpc"
-	"contrib.go.opencensus.io/exporter/ocagent"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/trace"
+	"google.golang.org/grpc"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 var (
@@ -23,7 +24,11 @@ var (
 )
 
 func main() {
-
+	tracer.Start(
+		tracer.WithEnv("staging"),
+		tracer.WithService("webserver"),
+		tracer.WithServiceVersion("env"),
+	)
 	if webPort == "" || emojisvcHost == "" || votingsvcHost == "" {
 		log.Fatalf("WEB_PORT (currently [%s]) EMOJISVC_HOST (currently [%s]) and VOTINGSVC_HOST (currently [%s]) INDEX_BUNDLE (currently [%s]) environment variables must me set.", webPort, emojisvcHost, votingsvcHost, indexBundle)
 	}
@@ -47,6 +52,7 @@ func main() {
 	defer emojiSvcConn.Close()
 
 	web.StartServer(webPort, webpackDevServerHost, indexBundle, emojiSvcClient, votingClient)
+	defer tracer.Stop()
 }
 
 func openGrpcClientConnection(host string) *grpc.ClientConn {

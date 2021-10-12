@@ -12,18 +12,24 @@ metadata:
   labels:
     app.kubernetes.io/name: web
     app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
+    app.kubernetes.io/version: v13
+    tags.datadoghq.com/env: staging
+    tags.datadoghq.com/service: web
+    tags.datadoghq.com/version: v13
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: web-svc
-      version: v11
+      version: v13
   template:
     metadata:
       labels:
         app: web-svc
-        version: v11
+        version: v13
+        tags.datadoghq.com/env: staging
+        tags.datadoghq.com/service: web
+        tags.datadoghq.com/version: v13
     spec:
       serviceAccountName: web
       containers:
@@ -36,7 +42,23 @@ spec:
           value: voting-svc.emojivoto:8080
         - name: INDEX_BUNDLE
           value: dist/index_bundle.js
-        image: docker.l5d.io/buoyantio/emojivoto-web:v11
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        image: ouhhhhcrab/emojivoto-web:v13
         name: web-svc
         ports:
         - containerPort: 8080
