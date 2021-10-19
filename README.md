@@ -87,6 +87,21 @@ export WEB_HOST=localhost:8080 # replace with your web location
 go run emojivoto-web/cmd/vote-bot/main.go
 ```
 
+## Building
+
+Building requires that you have protoc-gen-go v1.27.1 on your path. This can
+be installed by running:
+
+```bash
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+```
+
+Then you can set up proto files and build apps by running:
+
+```bash
+make build
+```
+
 ## Releasing a new version
 
 To build and push multi-arch docker images:
@@ -134,12 +149,6 @@ This can be disabled by unsetting the `PROM_PORT` environment variable.
 
 This app is written with React and bundled with webpack.
 Use the following to run the emojivoto go services and develop on the frontend.
-
-Set up proto files, build apps
-
-```bash
-make build
-```
 
 Start the voting service
 

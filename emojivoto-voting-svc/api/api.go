@@ -20,6 +20,7 @@ type PollServiceServer struct {
 	poll                    voting.Poll
 	failureRate             float32
 	artificialDelayDuration time.Duration
+	pb.UnimplementedVotingServiceServer
 }
 
 func (pS *PollServiceServer) vote(shortcode string) (*pb.VoteResponse, error) {
@@ -467,6 +468,7 @@ func NewGrpServer(grpcServer *grpc.Server, poll voting.Poll, failureRate float32
 		poll,
 		failureRate,
 		artificialDelayDuration,
+		pb.UnimplementedVotingServiceServer{},
 	}
 
 	pb.RegisterVotingServiceServer(grpcServer, server)
