@@ -10,8 +10,10 @@ clean:
 	mkdir -p $(target_dir)
 	mkdir -p gen
 
+PROTOC ?= ../bin/protoc
+
 protoc:
-	../bin/protoc -I .. ../proto/*.proto --go_out=gen --go-grpc_out=gen
+	$(PROTOC) -I .. ../proto/*.proto --go_out=gen --go-grpc_out=gen
 
 package: protoc compile build-container
 
