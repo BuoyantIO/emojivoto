@@ -9,6 +9,7 @@ check_init_config() {
         # export AMBASSADOR_API_KEY='NTIyOWExZDktYTc5...'
         echo 'AMBASSADOR_API_KEY is not currently defined. Please set the environment variable in the shell e.g.'
         echo 'export AMBASSADOR_API_KEY=NTIyOWExZDktYTc5...'
+        echo 'You can get an AMBASSADOR_API_KEY and free remote demo cluster at https://app.getambassador.io/cloud/'
         exit
     fi
 }
