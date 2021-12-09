@@ -9,7 +9,8 @@ check_init_config() {
         # export AMBASSADOR_API_KEY='NTIyOWExZDktYTc5...'
         echo 'AMBASSADOR_API_KEY is not currently defined. Please set the environment variable in the shell e.g.'
         echo 'export AMBASSADOR_API_KEY=NTIyOWExZDktYTc5...'
-        echo 'You can get an AMBASSADOR_API_KEY and free remote demo cluster by taking the tour of Ambassador Cloud at https://app.getambassador.io/cloud/'
+        echo 'You can get an AMBASSADOR_API_KEY and free remote demo cluster by taking the tour of Ambassador Cloud at https://app.getambassador.io/cloud/services?openCloudTour=true '
+        echo 'During the tour be sure to copy the AMBASSADOR_API_KEY from the "docker run" command'
         exit
     fi
 }
@@ -54,7 +55,8 @@ install_telepresence() {
 connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
     echo 'Connecting local dev env to remote K8s cluster'
-    telepresence intercept web-app-57bc7c4959 --service web-app --port 8083:80
+    telepresence login
+    telepresence intercept web-app-57bc7c4959 --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
 }
 
 open_editor() {
