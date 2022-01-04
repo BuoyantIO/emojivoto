@@ -13,7 +13,7 @@ clean:
 PROTOC ?= ../bin/protoc
 
 protoc:
-	$(PROTOC) -I .. ../proto/*.proto --go_out=gen --go-grpc_out=gen
+	$(PROTOC) -I .. ../proto/*.proto --go_out=paths=source_relative:./gen --go-grpc_out=paths=source_relative:./gen
 
 package: protoc compile build-container
 
