@@ -1,0 +1,32 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: install protobuf compiler
+        run: sudo apt install -y protobuf-compiler
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.5'
+      - name: install protoc
+        run: |
+              go get -u github.com/golang/protobuf/proto && \
+              go get -u github.com/golang/protobuf/protoc-gen-go && \
+              go get google.golang.org/protobuf/reflect/protoreflect && \
+              go get google.golang.org/protobuf/runtime/protoimpl && \
+              go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+      - name: Build release
+        run: make -C emojivoto-web build-releases
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          files: ./emojivoto-web/bin/*
