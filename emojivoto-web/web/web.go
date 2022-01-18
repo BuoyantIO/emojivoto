@@ -363,6 +363,13 @@ func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
 	})
 }
 
+func logRequest(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
+}
+
 func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
 	webApp := &WebApp{
 		emojiServiceClient:  emojiServiceClient,
@@ -374,7 +381,7 @@ func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votin
 	handle("/api/vote", webApp.voteEmojiHandler)
 	handle("/api/leaderboard", webApp.leaderboardHandler)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%s", webPort), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", webPort), logRequest(http.DefaultServeMux))
 	if err != nil {
 		panic(err)
 	}
