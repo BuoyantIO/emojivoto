@@ -36,7 +36,7 @@ func main() {
 		ocagent.WithInsecure(),
 		ocagent.WithReconnectionPeriod(5*time.Second),
 		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("voting"))
+		ocagent.WithServiceName("emoji"))
 	if err != nil {
 		log.Fatalf("Failed to create ocagent-exporter: %v", err)
 	}
