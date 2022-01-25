@@ -26,7 +26,7 @@ set_os_arch() {
     case $uname in
         "Darwin")
             OS="darwin"
-            MOUNT_VOLUME_LOCAL=~/Library/Application\ Support
+            MOUNT_VOLUME_LOCAL=~/Library/Application Support
             ;;
         "Linux")
             OS="linux"
@@ -111,7 +111,7 @@ connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
     echo 'Connecting local dev env to remote K8s cluster'
     telepresence login --apikey=$AMBASSADOR_API_KEY
-    telepresence intercept web-app-57bc7c4959 --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
+    telepresence intercept web-app-57bc7c4959 -n emojivoto --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
     telOut=$?
     if [ $telOut != 0 ]; then
         exit $telOut
