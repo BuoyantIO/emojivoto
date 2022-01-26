@@ -26,7 +26,7 @@ set_os_arch() {
     case $uname in
         "Darwin")
             OS="darwin"
-            MOUNT_VOLUME_LOCAL=~/Library/Application Support
+            MOUNT_VOLUME_LOCAL=~/Library/Application\ Support
             ;;
         "Linux")
             OS="linux"
@@ -79,14 +79,14 @@ run_dev_container() {
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
-    CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v $MOUNT_VOLUME_LOCAL:/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo )
+    CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo )
 }
 
 connect_to_k8s() {
     echo 'Extracting KUBECONFIG from container and connecting to cluster'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
         echo '.'
-        sleep 1s
+        sleep 1
     done
 
     export KUBECONFIG=./emojivoto_k8s_context.yaml
