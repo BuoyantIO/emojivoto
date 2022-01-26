@@ -86,7 +86,7 @@ connect_to_k8s() {
     echo 'Extracting KUBECONFIG from container and connecting to cluster'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
         echo '.'
-        sleep 1
+        sleep 2
     done
 
     export KUBECONFIG=./emojivoto_k8s_context.yaml
