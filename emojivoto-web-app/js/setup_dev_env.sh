@@ -4,7 +4,27 @@
 CONTAINER_ID=''
 OS=''
 ARCH=''
-MOUNT_VOLUME=''
+MOUNT_VOLUME_LOCAL=''
+USE_TELEMETRY=
+ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR'
+
+use_telemetry() {
+    USE_TELEMETRY=true
+}
+
+send_telemetry() {
+    if [ $USE_TELEMETRY = true ]; then
+        action=$1
+        ambassador_cloud_url="https://auth.datawire.io"
+        application_activities_url="${ambassador_cloud_url}/api/applicationactivities"
+        curl -X POST \
+          -H "X-Ambassador-API-Key: $AMBASSADOR_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"type": "'$ACTIVITY_REPORT_TYPE'", "extraProperties": {"action":"'"$action"'","os":"'"$OS"'","arch":"'"$ARCH"'"}}' \
+          -s \
+          $application_activities_url > /dev/null 2>&1
+    fi
+}
 
 has_cli() {
 
@@ -80,6 +100,7 @@ run_dev_container() {
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
     CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo )
+    send_telemetry "devContainerStarted"    
 }
 
 connect_to_k8s() {
@@ -93,6 +114,7 @@ connect_to_k8s() {
 
     echo 'Connected to cluster. Listing services in default namespace'
     kubectl get svc
+    send_telemetry "connectedToK8S"    
 }
 
 install_telepresence() {
@@ -102,8 +124,10 @@ install_telepresence() {
         echo "Installing Telepresence"
         sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/latest/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
+        send_telemetry "telepresenceInstalled"
     else
         echo "Telepresence already installed"
+        send_telemetry "telepresenceAlreadyInstalled"
     fi    
 }
 
@@ -114,8 +138,10 @@ connect_local_dev_env_to_remote() {
     telepresence intercept web-app-57bc7c4959 -n emojivoto --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
     telOut=$?
     if [ $telOut != 0 ]; then
+        send_telemetry "interceptFailed"
         exit $telOut
     fi
+    send_telemetry "interceptCreated"
 }
 
 open_editor() {
@@ -135,6 +161,7 @@ display_instructions_to_user () {
     echo 'export KUBECONFIG=./emojivoto_k8s_context.yaml'
 }
 
+use_telemetry
 has_cli
 set_os_arch
 check_init_config
