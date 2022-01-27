@@ -6,6 +6,7 @@ OS=''
 ARCH=''
 MOUNT_VOLUME_LOCAL=''
 USE_TELEMETRY=
+OPEN_EDITOR=
 ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR_SCRIPT'
 
 use_telemetry() {
@@ -47,10 +48,12 @@ set_os_arch() {
         "Darwin")
             OS="darwin"
             MOUNT_VOLUME_LOCAL=~/Library/Application\ Support
+            OPEN_EDITOR=open
             ;;
         "Linux")
             OS="linux"
             MOUNT_VOLUME_LOCAL=$(if [[ "$XDG_CONFIG_HOME" ]]; then echo "$XDG_CONFIG_HOME"; else echo "$HOME/.config"; fi)
+            OPEN_EDITOR=xdg-open
             ;;
         *)
             fatal "Unsupported os $uname"
@@ -150,7 +153,7 @@ open_editor() {
     sleep 2
 
     # replace this line with your editor of choice, e.g. VS code, Intelli J
-    $EDITOR .
+    $OPEN_EDITOR components/Vote.jsx
 }
 
 display_instructions_to_user () {
