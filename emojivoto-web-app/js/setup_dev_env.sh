@@ -8,6 +8,9 @@ MOUNT_VOLUME_LOCAL=''
 USE_TELEMETRY=
 OPEN_EDITOR=
 ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR_SCRIPT'
+EMOJIVOTO_NS='emojivoto'
+TOTAL_STEPS='7'
+
 
 use_telemetry() {
     USE_TELEMETRY=true
@@ -27,16 +30,26 @@ send_telemetry() {
     fi
 }
 
-has_cli() {
+display_step() {
+    echo -n "Step $1/$TOTAL_STEPS: "
+}
 
-    hasCurl=$(which curl)
+has_cli() {
+    display_step 1
+    echo 'Checking required tools'
+    _=$(which curl)
     if [ "$?" = "1" ]; then
         echo "You need curl to use this script."
         exit 1
     fi
-    hasKubectl=$(which kubectl)
+    _=$(which kubectl)
     if [ "$?" = "1" ]; then
         echo "You need kubectl to use this script. https://kubernetes.io/docs/tasks/tools/#kubectl"
+        exit 1
+    fi
+    _=$(which docker)
+    if [ "$?" = "1" ]; then
+        echo "You need docker to use this script. https://docs.docker.com/engine/install/"
         exit 1
     fi
 }
@@ -81,6 +94,8 @@ set_os_arch() {
 }
 
 check_init_config() {
+    display_step 2
+    echo 'Checking for AMBASSADOR_API_KEY environment variable'
     if [[ -z "${AMBASSADOR_API_KEY}" ]]; then
         # you will need to set the AMBASSADOR_API_KEY via the command line
         # export AMBASSADOR_API_KEY='NTIyOWExZDktYTc5...'
@@ -93,12 +108,14 @@ check_init_config() {
 }
 
 run_dev_container() {
-    echo 'Running dev container (and downloading if necessary)'
+    display_step 3
+    echo 'Configuring development container. This container encapsulates all the dependencies needed to run the emojivoto-web-app locally.'
+    echo 'This may take a few moments to download and start.'
 
     # check if dev container is already running and kill if so
     CONTAINER_ID=$(docker inspect --format="{{.Id}}" "ambassador-demo" )
-    if [ ! -z "$CONTAINER_ID" ]; then
-        docker kill $CONTAINER_ID
+    if [ -n "$CONTAINER_ID" ]; then
+        docker kill "$CONTAINER_ID"
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
@@ -107,7 +124,8 @@ run_dev_container() {
 }
 
 connect_to_k8s() {
-    echo 'Extracting KUBECONFIG from container and connecting to cluster'
+    display_step 4
+    echo 'Extracting KUBECONFIG from container'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
         echo '.'
         sleep 2
@@ -115,14 +133,15 @@ connect_to_k8s() {
 
     export KUBECONFIG=./emojivoto_k8s_context.yaml
 
-    echo 'Connected to cluster. Listing services in default namespace'
-    kubectl get svc
+    echo "Listing services in ${EMOJIVOTO_NS} namespace"
+    kubectl --namespace ${EMOJIVOTO_NS} get svc
     send_telemetry "connectedToK8S"    
 }
 
 install_telepresence() {
-    echo 'Configuring Telepresence'
-    hasTelepresence=$(which telepresence)
+    display_step 5
+    echo 'Checking for Telepresence'
+    _=$(which telepresence)
     if [ "$?" = "1" ]; then
         echo "Installing Telepresence"
         sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/latest/telepresence -o /usr/local/bin/telepresence
@@ -136,9 +155,10 @@ install_telepresence() {
 
 connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
-    echo 'Connecting local dev env to remote K8s cluster'
-    telepresence login --apikey=$AMBASSADOR_API_KEY
-    telepresence intercept web-app-57bc7c4959 -n emojivoto --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
+    display_step 6
+    echo 'Connecting local development environment to remote K8s cluster'
+    telepresence login --apikey=${AMBASSADOR_API_KEY}
+    telepresence intercept web-app-57bc7c4959 -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
     telOut=$?
     if [ $telOut != 0 ]; then
         send_telemetry "interceptFailed"
@@ -148,6 +168,7 @@ connect_local_dev_env_to_remote() {
 }
 
 open_editor() {
+    display_step 7
     echo 'Opening editor'
     # let the user see the output before opening the editor
     sleep 2
