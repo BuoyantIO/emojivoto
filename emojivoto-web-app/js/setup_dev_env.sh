@@ -34,9 +34,17 @@ display_step() {
     echo -n "Step $1/$TOTAL_STEPS: "
 }
 
+display_in_step() {
+    readarray -t y <<<"$1"
+    for i in "${y[@]}"; do
+        echo "          $i"
+    done
+
+}
+
 has_cli() {
     display_step 1
-    echo 'Checking required tools'
+    echo -n 'Checking required tools ... '
     _=$(which curl)
     if [ "$?" = "1" ]; then
         echo "You need curl to use this script."
@@ -52,6 +60,7 @@ has_cli() {
         echo "You need docker to use this script. https://docs.docker.com/engine/install/"
         exit 1
     fi
+    echo 'Complete.'
 }
 
 set_os_arch() {
@@ -110,16 +119,16 @@ check_init_config() {
 run_dev_container() {
     display_step 3
     echo 'Configuring development container. This container encapsulates all the dependencies needed to run the emojivoto-web-app locally.'
-    echo 'This may take a few moments to download and start.'
+    display_in_step 'This may take a few moments to download and start.'
 
     # check if dev container is already running and kill if so
     CONTAINER_ID=$(docker inspect --format="{{.Id}}" "ambassador-demo" )
     if [ -n "$CONTAINER_ID" ]; then
-        docker kill "$CONTAINER_ID"
+        _=$(docker kill "$CONTAINER_ID")
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
-    CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo )
+    CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo 2>/dev/null)
     send_telemetry "devContainerStarted"    
 }
 
@@ -127,14 +136,15 @@ connect_to_k8s() {
     display_step 4
     echo 'Extracting KUBECONFIG from container'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
-        echo '.'
+        display_in_step '.'
         sleep 2
     done
 
     export KUBECONFIG=./emojivoto_k8s_context.yaml
 
-    echo "Listing services in ${EMOJIVOTO_NS} namespace"
-    kubectl --namespace ${EMOJIVOTO_NS} get svc
+    display_in_step "Listing services in ${EMOJIVOTO_NS} namespace"
+    listSVC=$(kubectl --namespace ${EMOJIVOTO_NS} get svc)
+    display_in_step "$listSVC"
     send_telemetry "connectedToK8S"    
 }
 
@@ -143,12 +153,12 @@ install_telepresence() {
     echo 'Checking for Telepresence'
     _=$(which telepresence)
     if [ "$?" = "1" ]; then
-        echo "Installing Telepresence"
+        display_in_step "Installing Telepresence"
         sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/latest/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     else
-        echo "Telepresence already installed"
+        display_in_step "Telepresence already installed"
         send_telemetry "telepresenceAlreadyInstalled"
     fi    
 }
