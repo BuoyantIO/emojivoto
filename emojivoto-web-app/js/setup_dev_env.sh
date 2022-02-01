@@ -31,15 +31,7 @@ send_telemetry() {
 }
 
 display_step() {
-    echo -n "Step $1/$TOTAL_STEPS: "
-}
-
-display_in_step() {
-    readarray -t y <<<"$1"
-    for i in "${y[@]}"; do
-        echo "          $i"
-    done
-
+    echo -n "*** Step $1/$TOTAL_STEPS: "
 }
 
 has_cli() {
@@ -119,7 +111,7 @@ check_init_config() {
 run_dev_container() {
     display_step 3
     echo 'Configuring development container. This container encapsulates all the dependencies needed to run the emojivoto-web-app locally.'
-    display_in_step 'This may take a few moments to download and start.'
+    echo 'This may take a few moments to download and start.'
 
     # check if dev container is already running and kill if so
     CONTAINER_ID=$(docker inspect --format="{{.Id}}" "ambassador-demo" )
@@ -136,15 +128,15 @@ connect_to_k8s() {
     display_step 4
     echo 'Extracting KUBECONFIG from container'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
-        display_in_step '.'
+        echo '.'
         sleep 2
     done
 
     export KUBECONFIG=./emojivoto_k8s_context.yaml
 
-    display_in_step "Listing services in ${EMOJIVOTO_NS} namespace"
+    echo "Listing services in ${EMOJIVOTO_NS} namespace"
     listSVC=$(kubectl --namespace ${EMOJIVOTO_NS} get svc)
-    display_in_step "$listSVC"
+    echo "$listSVC"
     send_telemetry "connectedToK8S"    
 }
 
@@ -153,12 +145,12 @@ install_telepresence() {
     echo 'Checking for Telepresence'
     _=$(which telepresence)
     if [ "$?" = "1" ]; then
-        display_in_step "Installing Telepresence"
+        echo "Installing Telepresence"
         sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/latest/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     else
-        display_in_step "Telepresence already installed"
+        echo "Telepresence already installed"
         send_telemetry "telepresenceAlreadyInstalled"
     fi    
 }
