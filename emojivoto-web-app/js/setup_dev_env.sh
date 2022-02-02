@@ -36,20 +36,29 @@ display_step() {
 
 has_cli() {
     display_step 1
-    echo -n 'Checking required tools ... '
+    meet_requirements=true
+    echo 'Checking required tools ... '
     _=$(which curl)
     if [ "$?" = "1" ]; then
         echo "You need curl to use this script."
-        exit 1
+        meet_requirements=false
     fi
     _=$(which kubectl)
     if [ "$?" = "1" ]; then
         echo "You need kubectl to use this script. https://kubernetes.io/docs/tasks/tools/#kubectl"
-        exit 1
+        meet_requirements=false
     fi
     _=$(which docker)
     if [ "$?" = "1" ]; then
         echo "You need docker to use this script. https://docs.docker.com/engine/install/"
+        meet_requirements=false
+    fi
+
+    if (! docker stats --no-stream &> /dev/null); then
+        echo "Docker daemon if not running"
+        meet_requirements=false
+    fi
+    if [ $meet_requirements = false ]; then
         exit 1
     fi
     echo 'Complete.'
