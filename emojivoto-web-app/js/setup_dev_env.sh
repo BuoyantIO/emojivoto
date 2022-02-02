@@ -55,7 +55,7 @@ has_cli() {
     fi
 
     if (! docker stats --no-stream &> /dev/null); then
-        echo "Docker daemon if not running"
+        echo "Docker daemon is not running"
         meet_requirements=false
     fi
     if [ $meet_requirements = false ]; then
