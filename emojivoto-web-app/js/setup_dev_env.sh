@@ -109,7 +109,7 @@ check_init_config() {
 }
 
 run_dev_container() {
-    display_step 3
+    display_step 4
     echo 'Configuring development container. This container encapsulates all the dependencies needed to run the emojivoto-web-app locally.'
     echo 'This may take a few moments to download and start.'
 
@@ -125,7 +125,7 @@ run_dev_container() {
 }
 
 connect_to_k8s() {
-    display_step 4
+    display_step 5
     echo 'Extracting KUBECONFIG from container'
     until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
         echo '.'
@@ -141,7 +141,7 @@ connect_to_k8s() {
 }
 
 install_telepresence() {
-    display_step 5
+    display_step 3
     echo 'Checking for Telepresence'
     _=$(which telepresence)
     if [ "$?" = "1" ]; then
@@ -191,9 +191,9 @@ use_telemetry
 has_cli
 set_os_arch
 check_init_config
+install_telepresence
 run_dev_container
 connect_to_k8s
-install_telepresence
 connect_local_dev_env_to_remote
 open_editor
 display_instructions_to_user
