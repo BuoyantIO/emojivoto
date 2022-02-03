@@ -150,19 +150,30 @@ connect_to_k8s() {
     send_telemetry "connectedToK8S"    
 }
 
-install_telepresence() {
+install_upgrade_telepresence() {
     display_step 3
-    echo 'Checking for Telepresence'
+    install_telepresence=false
+    echo -n 'Checking for Telepresence ... '
     _=$(which telepresence)
     if [ "$?" = "1" ]; then
+        install_telepresence=true
         echo "Installing Telepresence"
+    else
+        if telepresence version|grep upgrade >/dev/null 2>&1; then
+            install_telepresence=true
+            # daemon and client need to have same version
+            _=$(telepresence quit)
+            echo "Upgrading Telepresence"
+        else
+            echo "Telepresence already installed"
+            send_telemetry "telepresenceAlreadyInstalled"
+        fi
+    fi    
+    if [ $install_telepresence = true ]; then
         sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/latest/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
-    else
-        echo "Telepresence already installed"
-        send_telemetry "telepresenceAlreadyInstalled"
-    fi    
+    fi
 }
 
 connect_local_dev_env_to_remote() {
@@ -201,7 +212,7 @@ use_telemetry
 has_cli
 set_os_arch
 check_init_config
-install_telepresence
+install_upgrade_telepresence
 run_dev_container
 connect_to_k8s
 connect_local_dev_env_to_remote
