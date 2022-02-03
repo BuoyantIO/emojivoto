@@ -123,13 +123,14 @@ run_dev_container() {
     echo 'This may take a few moments to download and start.'
 
     # check if dev container is already running and kill if so
-    CONTAINER_ID=$(docker inspect --format="{{.Id}}" "ambassador-demo" )
+    CONTAINER_ID=$(docker inspect --format="{{.Id}}" "ambassador-demo" 2>/dev/null)
     if [ -n "$CONTAINER_ID" ]; then
         _=$(docker kill "$CONTAINER_ID")
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
-    CONTAINER_ID=$(docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo 2>/dev/null)
+    docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo
+    CONTAINER_ID=$(docker ps --filter 'name=ambassador-demo' --format '{{.ID}}')
     send_telemetry "devContainerStarted"    
 }
 
