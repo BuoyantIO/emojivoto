@@ -10,6 +10,7 @@ OPEN_EDITOR=
 ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR_SCRIPT'
 EMOJIVOTO_NS='emojivoto'
 TOTAL_STEPS='7'
+SEGMENT=$1
 
 
 use_telemetry() {
@@ -24,7 +25,7 @@ send_telemetry() {
         curl -X POST \
           -H "X-Ambassador-API-Key: $AMBASSADOR_API_KEY" \
           -H "Content-Type: application/json" \
-          -d '{"type": "'$ACTIVITY_REPORT_TYPE'", "extraProperties": {"action":"'"$action"'","os":"'"$OS"'","arch":"'"$ARCH"'"}}' \
+          -d '{"type": "'$ACTIVITY_REPORT_TYPE'", "extraProperties": {"action":"'"$action"'","os":"'"$OS"'","arch":"'"$ARCH"'","segment":"'"$SEGMENT"'"}}' \
           -s \
           $application_activities_url > /dev/null 2>&1
     fi
