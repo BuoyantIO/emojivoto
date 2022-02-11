@@ -11,6 +11,7 @@ ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR_SCRIPT'
 EMOJIVOTO_NS='emojivoto'
 TOTAL_STEPS='7'
 SEGMENT=$1
+SYSTEMA_ENV=$2
 
 
 use_telemetry() {
@@ -130,20 +131,22 @@ run_dev_container() {
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
-    docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --cap-add=NET_ADMIN --device /dev/net/tun:/dev/net/tun --pull always --rm -it -e AMBASSADOR_API_KEY=$AMBASSADOR_API_KEY  -v "${MOUNT_VOLUME_LOCAL}":/root/.host_config  -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/emojivoto-node-and-go-demo
+    docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --pull always --rm -it -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour
     CONTAINER_ID=$(docker ps --filter 'name=ambassador-demo' --format '{{.ID}}')
     send_telemetry "devContainerStarted"    
 }
 
 connect_to_k8s() {
     display_step 5
-    echo 'Extracting KUBECONFIG from container'
-    until docker cp $CONTAINER_ID:/opt/telepresence-demo-cluster.yaml ./emojivoto_k8s_context.yaml > /dev/null 2>&1; do
-        echo '.'
-        sleep 2
-    done
-
+    echo 'Getting KUBECONFIG from demo cluster'
+    demo_cluster_url="https://auth.datawire.io/api/democlusters/telepresence-demo/config"
+    if [[ "$SYSTEMA_ENV" == "staging" ]]; then
+        demo_cluster_url="https://beta-auth.datawire.io/api/democlusters/telepresence-demo/config"
+    fi
+    demo_cluster_info=$(curl -H "X-Ambassador-API-Key:$AMBASSADOR_API_KEY" $demo_cluster_url -s)
+    echo "$demo_cluster_info" > ./emojivoto_k8s_context.yaml
     export KUBECONFIG=./emojivoto_k8s_context.yaml
+    kubectl config set-context --current --namespace=emojivoto
 
     echo "Listing services in ${EMOJIVOTO_NS} namespace"
     listSVC=$(kubectl --namespace ${EMOJIVOTO_NS} get svc)
@@ -181,6 +184,8 @@ connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
     display_step 6
     echo 'Connecting local development environment to remote K8s cluster'
+    telepresence quit
+    telepresence connect
     telepresence login --apikey=${AMBASSADOR_API_KEY}
     telepresence intercept web-app-57bc7c4959 -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
     telOut=$?
