@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -41,7 +42,18 @@ func main() {
 		log.Fatalf("WEB_HOST environment variable must me set")
 	}
 
-	hostOverride := os.Getenv("HOST_OVERRIDE")
+	hostOverride := strconv.Atoi(os.Getenv("HOST_OVERRIDE"))
+
+	timeToLive := strconv.Atoi(os.Getenv("TTL"))
+	deadline := 0
+	if timeToLive != 0 {
+		deadline := time.Now() + (timeToLive * time.Second)
+	}
+
+	requestRate := os.Getenv("REQUEST_RATE")
+	if requestRate < 1 {
+		requestRate = 1
+	}
 
 	oce, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
@@ -60,7 +72,13 @@ func main() {
 	}
 
 	for {
-		time.Sleep(time.Second)
+		// check if deadline has been reached, when TTL has been set.
+		if (deadline != 0) && (time.Now > deadline) {
+			fmt.Printf("Time to live of %d seconds reached, completing\n", timeToLive)
+			os.Exit(0)
+		}
+
+		time.Sleep(time.Second / requestRate)
 
 		// Get the list of available shortcodes
 		shortcodes, err := shortcodes(webURL, hostOverride)
