@@ -42,15 +42,18 @@ func main() {
 		log.Fatalf("WEB_HOST environment variable must me set")
 	}
 
-	hostOverride := strconv.Atoi(os.Getenv("HOST_OVERRIDE"))
+	hostOverride := os.Getenv("HOST_OVERRIDE")
 
-	timeToLive := strconv.Atoi(os.Getenv("TTL"))
-	deadline := 0
+	// setting the the TTL is optional, thus invalid numbers are simply ignored
+	timeToLive, _ := strconv.Atoi(os.Getenv("TTL"))
+	var deadline time.Time = time.Unix(0, 0)
+
 	if timeToLive != 0 {
-		deadline := time.Now() + (timeToLive * time.Second)
+		deadline = time.Now().Add(time.Second * time.Duration(timeToLive))
 	}
 
-	requestRate := os.Getenv("REQUEST_RATE")
+	// setting the the request rate is optional, thus invalid numbers are simply ignored
+	requestRate, _ := strconv.Atoi(os.Getenv("REQUEST_RATE"))
 	if requestRate < 1 {
 		requestRate = 1
 	}
@@ -73,12 +76,12 @@ func main() {
 
 	for {
 		// check if deadline has been reached, when TTL has been set.
-		if (deadline != 0) && (time.Now > deadline) {
+		if (!deadline.IsZero()) && time.Now().After(deadline) {
 			fmt.Printf("Time to live of %d seconds reached, completing\n", timeToLive)
 			os.Exit(0)
 		}
 
-		time.Sleep(time.Second / requestRate)
+		time.Sleep(time.Second / time.Duration(requestRate))
 
 		// Get the list of available shortcodes
 		shortcodes, err := shortcodes(webURL, hostOverride)
