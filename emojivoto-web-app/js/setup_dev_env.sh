@@ -141,7 +141,7 @@ connect_to_k8s() {
     echo 'Getting KUBECONFIG from demo cluster'
     demo_cluster_url="https://auth.datawire.io/api/democlusters/telepresence-demo/config"
     if [[ "$SYSTEMA_ENV" == "staging" ]]; then
-        demo_cluster_url="https://beta-auth.datawire.io/api/democlusters/telepresence-demo/config"
+        demo_cluster_url="https://staging-auth.datawire.io/api/democlusters/telepresence-demo/config"
     fi
     demo_cluster_info=$(curl -H "X-Ambassador-API-Key:$AMBASSADOR_API_KEY" $demo_cluster_url -s)
     echo "$demo_cluster_info" > ./emojivoto_k8s_context.yaml
