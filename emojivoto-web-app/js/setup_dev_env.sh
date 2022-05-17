@@ -163,10 +163,13 @@ install_upgrade_telepresence() {
         install_telepresence=true
         echo "Installing Telepresence"
     else
+        # Ensure that running telepresence daemons are stopped. A running daemon
+        # has its current working directory set to the directory where it was first
+        # started, and since the KUBECONFIG is set to a relative directory in this
+        # script, a previously started daemon might resolve it incorrectly.
+        _=$(telepresence quit -ur)
         if telepresence version|grep upgrade >/dev/null 2>&1; then
             install_telepresence=true
-            # daemon and client need to have same version
-            _=$(telepresence quit)
             echo "Upgrading Telepresence"
         else
             echo "Telepresence already installed"
