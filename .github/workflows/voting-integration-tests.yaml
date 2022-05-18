@@ -1,0 +1,52 @@
+name: Run Integration Test
+on:
+  push:
+    branches-ignore:
+    - 'main'
+jobs:
+  my-job:
+    name: Run Integration Test using Remote Cluster
+    runs-on: ubuntu-latest
+    env:
+      TELEPRESENCE_API_KEY: ${{ secrets.TELEPRESENCE_API_KEY }}
+      KUBECONFIG_FILE: ${{ secrets.KUBECONFIG_FILE }}
+      KUBECONFIG: /opt/kubeconfig
+    steps:
+      - name : Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.17'
+      - name: Run voting service
+        uses: ./.github/actions/run-voting-service/
+
+      - name: Create kubeconfig file
+        run: |
+          cat <<EOF > /opt/kubeconfig
+          ${{ env.KUBECONFIG_FILE }}
+          EOF
+      - name: Install Telepresence
+        uses: datawire/telepresence-actions/install@v0.1
+        with:
+          version: 2.5.8
+      - name: Connect to remote cluster
+        uses: datawire/telepresence-actions/connect@v0.1
+      - name: Login to Ambassador Cloud
+        uses: datawire/telepresence-actions/login@v0.1
+        with:
+          telepresence_api_key: ${{ secrets.TELEPRESENCE_API_KEY }}
+      - name: Intercept remote service
+        uses: datawire/telepresence-actions/intercept@v0.1
+        with:
+          service_name: voting
+          service_port: 8081:8080
+          namespace: emojivoto
+          http_header: "x-telepresence-intercept-id=service-intercepted"
+
+      - name: Run integration test
+        shell: bash
+        run: |
+          sleep 10 && curl --header "x-telepresence-intercept-id:service-intercepted" -f "http://emojivoto.aglez.k736.net/api/vote?choice=:doughnut:"
