@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/ocagent"
@@ -43,6 +44,20 @@ func main() {
 
 	hostOverride := os.Getenv("HOST_OVERRIDE")
 
+	// setting the the TTL is optional, thus invalid numbers are simply ignored
+	timeToLive, _ := strconv.Atoi(os.Getenv("TTL"))
+	var deadline time.Time = time.Unix(0, 0)
+
+	if timeToLive != 0 {
+		deadline = time.Now().Add(time.Second * time.Duration(timeToLive))
+	}
+
+	// setting the the request rate is optional, thus invalid numbers are simply ignored
+	requestRate, _ := strconv.Atoi(os.Getenv("REQUEST_RATE"))
+	if requestRate < 1 {
+		requestRate = 1
+	}
+
 	oce, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
 		ocagent.WithReconnectionPeriod(5*time.Second),
@@ -60,7 +75,13 @@ func main() {
 	}
 
 	for {
-		time.Sleep(time.Second)
+		// check if deadline has been reached, when TTL has been set.
+		if (!deadline.IsZero()) && time.Now().After(deadline) {
+			fmt.Printf("Time to live of %d seconds reached, completing\n", timeToLive)
+			os.Exit(0)
+		}
+
+		time.Sleep(time.Second / time.Duration(requestRate))
 
 		// Get the list of available shortcodes
 		shortcodes, err := shortcodes(webURL, hostOverride)
