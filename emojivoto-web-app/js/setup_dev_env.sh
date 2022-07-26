@@ -187,10 +187,18 @@ connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
     display_step 6
     echo 'Connecting local development environment to remote K8s cluster'
+
+    svcName="ambassador"
+    kubectl get svc ambassador -n ambassador
+    ambassadorSvcOut=$?
+    if [ $ambassadorSvcOut != 0 ]; then
+        svcName="edge-stack"
+    fi
+
     telepresence quit
     telepresence login --apikey=${AMBASSADOR_API_KEY}
     telepresence connect
-    telepresence intercept web-app-57bc7c4959 -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ambassador.ambassador --ingress-l5 ambassador.ambassador
+    telepresence intercept web-app-57bc7c4959 -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ${svcName}.ambassador --ingress-l5 ${svcName}.ambassador
     telOut=$?
     if [ $telOut != 0 ]; then
         send_telemetry "interceptFailed"
