@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: datawire/emojivoto-web:v11.5
+    image: datawire/emojivoto-web:v11.6
     environment:
       - WEB_PORT=8080
       - EMOJISVC_HOST=emoji-svc:8080
@@ -15,7 +15,7 @@ services:
       - emoji-svc
 
   vote-bot:
-    image: datawire/emojivoto-web:v11.5
+    image: datawire/emojivoto-web:v11.6
     entrypoint: emojivoto-vote-bot
     environment:
       - WEB_HOST=web:8080
@@ -23,14 +23,14 @@ services:
       - web
 
   emoji-svc:
-    image: datawire/emojivoto-emoji-svc:v11.5
+    image: datawire/emojivoto-emoji-svc:v11.6
     environment:
       - GRPC_PORT=8080
     ports:
       - "8081:8080"
 
   voting-svc:
-    image: datawire/emojivoto-voting-svc:v11.5
+    image: datawire/emojivoto-voting-svc:v11.6
     environment:
       - GRPC_PORT=8080
     ports:

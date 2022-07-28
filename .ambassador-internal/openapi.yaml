@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Emojivoto API
-  description: Emojivoto API
+  description: Endpoints for the Emojivoto backend.
   version: 0.1.0
 paths:
   /vote:
