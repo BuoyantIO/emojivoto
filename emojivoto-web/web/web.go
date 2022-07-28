@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
+	"github.com/getkin/kin-openapi/openapi3"
 	"go.opencensus.io/plugin/ochttp"
 )
 
@@ -334,6 +335,22 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *WebApp) openAPIHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	doc, err := openapi3.NewLoader().LoadFromFile("/.ambassador-internal/openapi.yaml")
+	if err != nil {
+		writeError(err, w, r, http.StatusInternalServerError)
+		return
+	}
+
+	err = writeJsonBody(w, http.StatusOK, doc)
+
+	if err != nil {
+		writeError(err, w, r, http.StatusInternalServerError)
+	}
+
+}
+
 func (app *WebApp) faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/favicon.ico")
 }
@@ -380,6 +397,7 @@ func StartServer(webPort string, emojiServiceClient pb.EmojiServiceClient, votin
 	handle("/api/list", webApp.listEmojiHandler)
 	handle("/api/vote", webApp.voteEmojiHandler)
 	handle("/api/leaderboard", webApp.leaderboardHandler)
+	handle("/api/openapi", webApp.openAPIHandler)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", webPort), logRequest(http.DefaultServeMux))
 	if err != nil {

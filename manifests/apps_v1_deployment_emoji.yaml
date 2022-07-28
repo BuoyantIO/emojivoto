@@ -23,7 +23,7 @@ spec:
           value: "8080"
         - name: PROM_PORT
           value: "8801"
-        image: datawire/emojivoto-emoji-svc:v11.1
+        image: datawire/emojivoto-emoji-svc:v11.5
         name: emoji-svc
         ports:
         - containerPort: 8080

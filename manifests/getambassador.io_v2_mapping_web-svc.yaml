@@ -8,3 +8,5 @@ spec:
   rewrite: /api/
   resolver: endpoint
   service: web-svc:8080
+  docs:
+    path: /openapi

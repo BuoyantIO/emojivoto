@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Emojivoto API
+  description: Emojivoto API
+  version: 0.1.0
+paths:
+  /vote:
+    get:
+      parameters:
+        - in: query
+          name: choice
+          schema:
+            type: string
+          required: true
+          description: The emoji to vote for
+      responses:
+        '200':
+          description: The resource was deleted successfully.
+  /list:
+    get:
+      summary: Returns a list of available emojies
+      responses:
+        '200':
+          description: A JSON object with a quote and some additional metadata.
+          content:
+            application/json:
+              schema:
+                items:
+                  type: "array"
+                  items:
+                    type: "object"
+                    properties:
+                      shortcode:
+                        type: string
+                      unicode:
+                        type: string
+  /leaderboard:
+    get:
+      summary: Returns a leaderboard of the best emojies
+      responses:
+        '200':
+          description: A JSON object with a quote and some additional metadata.
+          content:
+            application/json:
+              schema:
+                items:
+                  type: "array"
+                  items:
+                    type: "object"
+                    properties:
+                      shortcode:
+                        type: string
+                      unicode:
+                        type: string
+                      votes:
+                        type: number
