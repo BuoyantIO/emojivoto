@@ -198,7 +198,10 @@ connect_local_dev_env_to_remote() {
     telepresence quit
     telepresence login --apikey=${AMBASSADOR_API_KEY}
     telepresence connect
-    telepresence intercept web-app-57bc7c4959 -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ${svcName}.ambassador --ingress-l5 ${svcName}.ambassador
+    
+    interceptName=$(kubectl get rs -n emojivoto --selector=app=web-app --no-headers -o custom-columns=":metadata.name")
+    telepresence intercept ${interceptName} -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ${svcName}.ambassador --ingress-l5 ${svcName}.ambassador
+
     telOut=$?
     if [ $telOut != 0 ]; then
         send_telemetry "interceptFailed"
