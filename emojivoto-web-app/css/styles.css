@@ -91,7 +91,7 @@ a {
 }
 
 .background {
-  padding-top: 2vw;
+  padding: 2vw;
   height: 100%;
   min-height: 100vh;
   background: linear-gradient(124deg, #9B51E0 0%, #FF009B 23.76%, #F2C94C 47.51%, #2F80ED 78.45%, #219653 100%);
@@ -103,7 +103,7 @@ a {
 }
 
 .background-500 {
-  padding-top: 2vw;
+  padding: 2vw;
   height: 100%;
   min-height: 100vh;
   background-color: yellow;
