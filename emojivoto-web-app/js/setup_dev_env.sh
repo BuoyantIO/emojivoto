@@ -177,7 +177,7 @@ install_upgrade_telepresence() {
         fi
     fi    
     if [ $install_telepresence = true ]; then
-        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.6.8/telepresence -o /usr/local/bin/telepresence
+        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.7.1/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     fi
@@ -196,6 +196,7 @@ connect_local_dev_env_to_remote() {
     fi
 
     telepresence quit
+    telepresence helm install --upgrade
     telepresence login --apikey=${AMBASSADOR_API_KEY}
     telepresence connect
     
