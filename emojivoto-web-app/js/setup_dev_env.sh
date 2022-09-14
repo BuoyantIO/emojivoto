@@ -113,7 +113,7 @@ check_init_config() {
         # export AMBASSADOR_API_KEY='NTIyOWExZDktYTc5...'
         echo 'AMBASSADOR_API_KEY is not currently defined. Please set the environment variable in the shell e.g.'
         echo 'export AMBASSADOR_API_KEY=NTIyOWExZDktYTc5...'
-        echo 'You can get an AMBASSADOR_API_KEY and free remote demo cluster by taking the tour of Ambassador Cloud at https://app.getambassador.io/cloud/services?openCloudTour=true '
+        echo 'You can get an AMBASSADOR_API_KEY and free remote demo cluster by taking the tour of Ambassador Cloud at https://app.getambassador.io/cloud/welcome?tour=intermediate '
         echo 'During the tour be sure to copy the AMBASSADOR_API_KEY from the "docker run" command'
         exit
     fi
@@ -177,7 +177,7 @@ install_upgrade_telepresence() {
         fi
     fi    
     if [ $install_telepresence = true ]; then
-        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.7.1/telepresence -o /usr/local/bin/telepresence
+        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.7.3/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     fi
