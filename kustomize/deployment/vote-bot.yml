@@ -19,6 +19,8 @@ spec:
         app: vote-bot
         version: v11
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: emojivotoapp        
       containers:
       - command:
         - emojivoto-vote-bot

@@ -25,6 +25,8 @@ spec:
         app: voting-svc
         version: v11
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: emojivotoapp        
       serviceAccountName: voting
       containers:
       - env:

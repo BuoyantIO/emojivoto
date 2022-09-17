@@ -25,6 +25,8 @@ spec:
         app: emoji-svc
         version: v11
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: emojivotoapp    
       serviceAccountName: emoji
       containers:
       - env:
