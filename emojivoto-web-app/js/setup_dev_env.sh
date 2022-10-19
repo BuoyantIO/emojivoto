@@ -167,7 +167,7 @@ install_upgrade_telepresence() {
         # has its current working directory set to the directory where it was first
         # started, and since the KUBECONFIG is set to a relative directory in this
         # script, a previously started daemon might resolve it incorrectly.
-        _=$(telepresence quit -ur)
+        _=$(telepresence quit -s)
         if telepresence version|grep upgrade >/dev/null 2>&1; then
             install_telepresence=true
             echo "Upgrading Telepresence"
@@ -177,7 +177,7 @@ install_upgrade_telepresence() {
         fi
     fi    
     if [ $install_telepresence = true ]; then
-        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.7.6/telepresence -o /usr/local/bin/telepresence
+        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.8.2/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     fi
