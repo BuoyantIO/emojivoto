@@ -196,7 +196,7 @@ connect_local_dev_env_to_remote() {
     fi
 
     telepresence quit
-    telepresence helm install --upgrade
+    telepresence helm upgrade --team-mode
     telepresence login --apikey=${AMBASSADOR_API_KEY}
     telepresence connect
     
