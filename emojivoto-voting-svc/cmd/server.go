@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -13,12 +14,17 @@ import (
 
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/api"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
+	otelgrpc "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 
-	"contrib.go.opencensus.io/exporter/ocagent"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
 	"google.golang.org/grpc"
 )
 
@@ -38,15 +44,28 @@ func main() {
 		log.Fatalf("GRPC_PORT (currently [%s]) environment variable must me set to run the server.", grpcPort)
 	}
 
-	oce, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithReconnectionPeriod(5*time.Second),
-		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("voting"))
+	r := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceNameKey.String("votoemoji-voting"),
+	)
+
+	client := otlptracegrpc.NewClient(otlptracegrpc.WithEndpoint(ocagentHost), otlptracegrpc.WithInsecure())
+	exporter, err := otlptrace.New(context.Background(), client)
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		panic(fmt.Sprintf("creating OTLP trace exporter: %v", err))
 	}
-	trace.RegisterExporter(oce)
+
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(r),
+	)
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			panic(err)
+		}
+	}()
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+	otel.SetTracerProvider(tp)
 
 	poll := voting.NewPoll()
 
@@ -71,9 +90,8 @@ func main() {
 	go func() {
 		grpc_prometheus.EnableHandlingTimeHistogram()
 		grpcServer := grpc.NewServer(
-			grpc.StatsHandler(&ocgrpc.ServerHandler{}),
-			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
-			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
 		)
 
 		setFailureRateOrDefault(failureRateVar, &failureRateFloat)

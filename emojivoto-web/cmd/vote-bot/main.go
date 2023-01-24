@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,9 +13,14 @@ import (
 	"strconv"
 	"time"
 
-	"contrib.go.opencensus.io/exporter/ocagent"
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 // VoteBot votes for emoji! :ballot_box_with_check:
@@ -25,7 +31,7 @@ import (
 // pick a favorite, so it picks one at random. C'mon VoteBot, try harder!
 
 var (
-	client = &http.Client{Transport: &ochttp.Transport{}}
+	client = &http.Client{Transport: otelhttp.NewTransport(nil)}
 
 	ocagentHost = os.Getenv("OC_AGENT_HOST")
 )
@@ -58,23 +64,46 @@ func main() {
 		requestRate = 1
 	}
 
-	oce, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithReconnectionPeriod(5*time.Second),
-		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("vote-bot"))
+	// Identify service
+	r := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceNameKey.String("bot-vote"),
+	)
+
+	// Create exporter client
+	client := otlptracegrpc.NewClient(otlptracegrpc.WithEndpoint(ocagentHost), otlptracegrpc.WithInsecure())
+	exporter, err := otlptrace.New(context.Background(), client)
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		panic(fmt.Sprintf("creating OTLP trace exporter: %v", err))
 	}
-	trace.RegisterExporter(oce)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
+	// Create Tracer Provider
+	// TracerProvider will provide instrumentations with an impl of Tracer.
+	// Tracer funnels data to export pipelines (span processors)
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(r),
+		trace.WithSampler(trace.AlwaysSample()),
+	)
+	log.Print("Always sampling")
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			panic(err)
+		}
+	}()
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+	otel.SetTracerProvider(tp)
+
+	//trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	webURL := "http://" + webHost
 	if _, err := url.Parse(webURL); err != nil {
 		log.Fatalf("WEB_HOST %s is invalid", webHost)
 	}
 
+	ctx := context.Background()
 	for {
+		//traceCtx, span := otel.Tracer("bot-vote").Start(ctx, "Main routine")
 		// check if deadline has been reached, when TTL has been set.
 		if (!deadline.IsZero()) && time.Now().After(deadline) {
 			fmt.Printf("Time to live of %d seconds reached, completing\n", timeToLive)
@@ -84,7 +113,7 @@ func main() {
 		time.Sleep(time.Second / time.Duration(requestRate))
 
 		// Get the list of available shortcodes
-		shortcodes, err := shortcodes(webURL, hostOverride)
+		shortcodes, err := shortcodes(ctx, webURL, hostOverride)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			continue
@@ -94,18 +123,21 @@ func main() {
 		probability := rand.Float32()
 		switch {
 		case probability < 0.15:
-			err = vote(webURL, hostOverride, ":doughnut:")
+			err = vote(ctx, webURL, hostOverride, ":doughnut:")
 		default:
 			random := shortcodes[rand.Intn(len(shortcodes))]
-			err = vote(webURL, hostOverride, random)
+			err = vote(ctx, webURL, hostOverride, random)
 		}
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
+		//defer span.End()
 	}
 }
 
-func shortcodes(webURL string, hostOverride string) ([]string, error) {
+func shortcodes(_ctx context.Context, webURL string, hostOverride string) ([]string, error) {
+	//ctx, span := otel.Tracer("bot-vote").Start(ctx, "Shortcodes")
+	//defer span.End()
 	url := fmt.Sprintf("%s/api/list", webURL)
 	req, _ := http.NewRequest("GET", url, nil)
 	if hostOverride != "" {
@@ -136,7 +168,9 @@ func shortcodes(webURL string, hostOverride string) ([]string, error) {
 	return shortcodes, nil
 }
 
-func vote(webURL string, hostOverride string, shortcode string) error {
+func vote(ctx context.Context, webURL string, hostOverride string, shortcode string) error {
+	//ctx, span := otel.Tracer("bot-vote").Start(ctx, "Vote")
+	//defer span.End()
 	fmt.Printf("✔ Voting for %s\n", shortcode)
 
 	url := fmt.Sprintf("%s/api/vote?choice=%s", webURL, shortcode)

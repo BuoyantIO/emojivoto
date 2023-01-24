@@ -12,7 +12,7 @@ import (
 	"strconv"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
-	"go.opencensus.io/plugin/ochttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type WebApp struct {
@@ -82,6 +82,14 @@ func (app *WebApp) leaderboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func prettyPrintHeaders(r *http.Request) {
+	b, err := json.MarshalIndent(r.Header, "", " ")
+	if err != nil {
+		log.Printf("Failed to pretty print errors for %v: %v", r, err)
+	}
+	log.Printf("Headers: %s", string(b))
+}
+
 func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 	emojiShortcode := r.FormValue("choice")
 	if emojiShortcode == "" {
@@ -90,6 +98,7 @@ func (app *WebApp) voteEmojiHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	prettyPrintHeaders(r)
 	request := &pb.FindByShortcodeRequest{
 		Shortcode: emojiShortcode,
 	}
@@ -379,9 +388,8 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 }
 
 func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
-	http.Handle(path, &ochttp.Handler{
-		Handler: http.HandlerFunc(h),
-	})
+	handler := http.HandlerFunc(h)
+	http.Handle(path, otelhttp.NewHandler(handler, path))
 }
 
 func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {

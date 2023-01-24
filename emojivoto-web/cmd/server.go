@@ -1,16 +1,24 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
-	"time"
 
 	pb "github.com/buoyantio/emojivoto/emojivoto-web/gen/proto"
 	"github.com/buoyantio/emojivoto/emojivoto-web/web"
 	"google.golang.org/grpc"
-	"contrib.go.opencensus.io/exporter/ocagent"
-	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
+
+	otelgrpc "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 var (
@@ -28,15 +36,33 @@ func main() {
 		log.Fatalf("WEB_PORT (currently [%s]) EMOJISVC_HOST (currently [%s]) and VOTINGSVC_HOST (currently [%s]) INDEX_BUNDLE (currently [%s]) environment variables must me set.", webPort, emojisvcHost, votingsvcHost, indexBundle)
 	}
 
-	oce, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithReconnectionPeriod(5*time.Second),
-		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("web"))
+	// Identify service
+	r := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceNameKey.String("votomoji-web"),
+	)
+
+	// Create exporter client
+	client := otlptracegrpc.NewClient(otlptracegrpc.WithEndpoint(ocagentHost), otlptracegrpc.WithInsecure())
+	exporter, err := otlptrace.New(context.Background(), client)
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		panic(fmt.Sprintf("creating OTLP trace exporter: %v", err))
 	}
-	trace.RegisterExporter(oce)
+
+	// Create Tracer Provider
+	// TracerProvider will provide instrumentations with an impl of Tracer.
+	// Tracer funnels data to export pipelines (span processors)
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(r),
+	)
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			panic(err)
+		}
+	}()
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+	otel.SetTracerProvider(tp)
 
 	votingSvcConn := openGrpcClientConnection(votingsvcHost)
 	votingClient := pb.NewVotingServiceClient(votingSvcConn)
@@ -54,7 +80,8 @@ func openGrpcClientConnection(host string) *grpc.ClientConn {
 	conn, err := grpc.Dial(
 		host,
 		grpc.WithInsecure(),
-		grpc.WithStatsHandler(new(ocgrpc.ClientHandler)))
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
 
 	if err != nil {
 		panic(err)
