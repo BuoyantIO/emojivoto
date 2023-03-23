@@ -120,7 +120,7 @@ check_init_config() {
 }
 
 run_dev_container() {
-    display_step 4
+    display_step 6
     echo 'Configuring development container. This container encapsulates all the dependencies needed to run the emojivoto-web-app locally.'
     echo 'This may take a few moments to download and start.'
 
@@ -137,7 +137,7 @@ run_dev_container() {
 }
 
 connect_to_k8s() {
-    display_step 5
+    display_step 4
     echo 'Getting KUBECONFIG from demo cluster'
     demo_cluster_url="https://auth.datawire.io/api/democlusters/telepresence-demo/config"
     if [[ "$SYSTEMA_ENV" == "staging" ]]; then
@@ -185,7 +185,7 @@ install_upgrade_telepresence() {
 
 connect_local_dev_env_to_remote() {
     export KUBECONFIG=./emojivoto_k8s_context.yaml
-    display_step 6
+    display_step 5
     echo 'Connecting local development environment to remote K8s cluster'
 
     svcName="ambassador"
