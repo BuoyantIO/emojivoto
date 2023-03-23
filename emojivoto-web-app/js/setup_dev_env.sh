@@ -131,7 +131,7 @@ run_dev_container() {
     fi
 
     # run the dev container, exposing 8081 gRPC port and volume mounting code directory
-    docker run -d -p8083:8083 -p8080:8080 --name ambassador-demo --pull always --rm -it -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour
+    docker run -d --name ambassador-demo --pull always --network=container:tp-default --rm -it -v $(pwd):/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour
     CONTAINER_ID=$(docker ps --filter 'name=ambassador-demo' --format '{{.ID}}')
     send_telemetry "devContainerStarted"    
 }
@@ -198,7 +198,8 @@ connect_local_dev_env_to_remote() {
     telepresence quit
     telepresence helm upgrade --team-mode
     telepresence login --apikey=${AMBASSADOR_API_KEY}
-    telepresence connect
+    telepresence quit -s
+    telepresence connect --docker
     
     interceptName=$(kubectl get rs -n emojivoto --selector=app=web-app --no-headers -o custom-columns=":metadata.name")
     telepresence intercept ${interceptName} -n ${EMOJIVOTO_NS} --service web-app --port 8083:80 --ingress-port 80 --ingress-host ${svcName}.ambassador --ingress-l5 ${svcName}.ambassador
@@ -234,9 +235,9 @@ has_cli
 set_os_arch
 check_init_config
 install_upgrade_telepresence
-run_dev_container
 connect_to_k8s
 connect_local_dev_env_to_remote
+run_dev_container
 open_editor
 display_instructions_to_user
 
