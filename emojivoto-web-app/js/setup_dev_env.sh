@@ -177,7 +177,7 @@ install_upgrade_telepresence() {
         fi
     fi    
     if [ $install_telepresence = true ]; then
-        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.13.1/telepresence -o /usr/local/bin/telepresence
+        sudo curl -fL https://app.getambassador.io/download/tel2/${OS}/${ARCH}/2.13.2/telepresence -o /usr/local/bin/telepresence
         sudo chmod a+x /usr/local/bin/telepresence
         send_telemetry "telepresenceInstalled"
     fi
