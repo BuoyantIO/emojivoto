@@ -3,13 +3,9 @@ param([string]$action="TP_SCIPT")
 $Global:USE_TELEMETRY=$true
 $Global:ACTION=$action
 $Global:ACTIVITY_REPORT_TYPE='INTERMEDIATE_CLOUD_TOUR_SCRIPT'
-$Global:OS_INFO=Get-ComputerInfo
 $Global:SEGMENT=$action
 $Global:TOTAL_STEPS=7
-$Global:OS="windows"
-$Global:ARCH="AMD64"
 $Global:EMOJIVOTO_NS="emojivoto"
-$Env:AMBASSADOR_API_KEY="ZjRlMTAzMDYtYjU5Ni00NTU3LTk2YjgtMTM3MTMzOWZjNmQxOlB0T3A0VFg0TG5JZVVucFJ1VmwzNEJOMHRFNk1nakRCTVIwSw=="
 
 function use_telemetry {
     $Global:USE_TELEMETRY=$true
@@ -20,22 +16,21 @@ function send_telemetry{
         [string]$action
     )
     if ($Global:USE_TELEMETRY) {
-        [string]$ambassador_cloud_url="https://auth.datawire.io"
-        [string]$application_activities_url="$ambassador_cloud_url/api/applicationactivities"
-        [string]$body = @{
+        #[string]$ambassador_cloud_url="https://auth.datawire.io/api/applicationactivities"
+        $body = @{
             type = "$Global:ACTIVITY_REPORT_TYPE"
             extraProperties = @{
-                "action" = "$action"
-                "os" = "$Global:OS_INFO.OperatingSystem"
-                "arch" = "$Global:OS_INFO.OperatingSystemArchitecture"
-                "segment" = "$Global:SEGMENT"
+                action = "$action"
+                os = "windows"
+                arch = "amd64"
+                segment = "$Global:SEGMENT"
             }
         } | ConvertTo-Json
         $headers=@{
-            "X-Ambassador-API-KEY" = "$Env:AMBASSADOR_API_KEY"
+            "X-Ambassador-Api-Key" = "$Env:AMBASSADOR_API_KEY"
             "Content-Type" = "application/json"
         }
-        Invoke-WebRequest -Uri $application_activities_url -Headers $headers -Body $body -Method 'POST'
+        Invoke-WebRequest "https://auth.datawire.io/api/applicationactivities" -Headers $headers -Body $body -Method 'POST' -UseBasicParsing  2>&1 | Out-Null
     }
 }
 
@@ -151,24 +146,13 @@ function install_upgrade_telepresence{
             send_telemetry("telepresenceAlreadyInstalled")
         }
     }
-    #if ($install_telepresence) {
+    if ($install_telepresence) {
         $telepresence_download_url = "https://app.getambassador.io/download/tel2/windows/amd64/latest/telepresence-setup.exe"
-        #Invoke-WebRequest $telepresence_download_url -OutFile telepresence.zip
-        #Invoke-WebRequest $telepresence_download_url -OutFile telepresence-setup.exe
-        $telepresenceOutput = Start-Process .\telepresence-setup.exe -NoNewWindow -Wait
-    if ($telepresenceOutput.ExitCode -ne 0) {
-        Write-Host "You need to install telepresence to continue with the execution of this script."
-        exit 1
+        Invoke-WebRequest $telepresence_download_url -OutFile telepresence-setup.exe
+        Start-Process .\telepresence-setup.exe -NoNewWindow -Wait
+        Remove-Item telepresence-setup.exe -Recurse -Confirm:$false -Force
+        send_telemetry("telepresenceInstalled")
     }
-        #powershell.exe -Confirm:$false -ExecutionPolicy bypass -c " . '.\telepresence-setup.exe';"
-        #Expand-Archive -Path telepresence.zip -DestinationPath telepresenceInstaller/telepresence
-        #Remove-Item 'telepresence.zip'
-        #Set-Location telepresenceInstaller/telepresence
-        #powershell.exe -ExecutionPolicy bypass -c " . '.\install-telepresence.ps1';"        
-        #Set-Location ../..
-        #Remove-Item telepresenceInstaller -Recurse -Confirm:$false -Force
-        #send_telemetry("telepresenceInstalled")
-    #}
 }
 
 function connect_local_dev_env_to_remote{
@@ -185,7 +169,7 @@ function connect_local_dev_env_to_remote{
 
     telepresence quit > $null
     telepresence helm upgrade --team-mode > $null
-    telepresence login --apikey="$Env:AMBASSADOR_API_KEY"
+    telepresence login --apikey="$Env:AMBASSADOR_API_KEY"  2>&1 | Out-Null
     telepresence quit -s > $null
     telepresence connect --docker > $null
 
