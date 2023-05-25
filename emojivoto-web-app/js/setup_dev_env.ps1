@@ -101,7 +101,7 @@ function run_dev_container{
     if ($CONTAINER_ID) {
         docker kill $CONTAINER_ID >$null
     }
-    docker run -d --name ambassador-demo --pull always --network=container:tp-default --rm -it -v ${Get-Location}:\opt\emojivoto\emojivoto-web-app\js datawire/intermediate-tour
+    docker run -d --name ambassador-demo --pull always --network=container:tp-default --rm -it -v ${PWD}:/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour
     $CONTAINER_ID=$(docker ps --filter 'name=ambassador-demo' --format '{{.ID}}')
     send_telemetry("devContainerStarted")
 }
@@ -117,7 +117,7 @@ function connect_to_k8s{
 
     Invoke-WebRequest $demo_cluster_url -Headers @{ "X-Ambassador-API-Key" = $env:AMBASSADOR_API_KEY } -ContentType "application/json" -OutFile 'emojivoto_k8s_context.yaml'
     $env:KUBECONFIG = './emojivoto_k8s_context.yaml'
-    kubectl config set-context --current --namespace=emojivoto
+    kubectl config set-context --current --namespace=emojivoto 2>&1 | Out-Null
 
     Write-Host "Listing services in ${Global:EMOJIVOTO_NS} namespace"
     $listSVC = kubectl --namespace ${Global:EMOJIVOTO_NS} get svc
@@ -151,6 +151,7 @@ function install_upgrade_telepresence{
         Invoke-WebRequest $telepresence_download_url -OutFile telepresence-setup.exe
         Start-Process .\telepresence-setup.exe -NoNewWindow -Wait
         Remove-Item telepresence-setup.exe -Recurse -Confirm:$false -Force
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
         send_telemetry("telepresenceInstalled")
     }
 }
@@ -160,18 +161,12 @@ function connect_local_dev_env_to_remote{
     display_step 5
     Write-Host 'Connecting local development environment to remote K8s cluster'
 
-    $svcName = "ambassador"
-    kubectl get svc ambassador -n ambassador
-    $ambassadorSvcOut = $LASTEXITCODE
-    if ($ambassadorSvcOut -ne 0) {
-        $svcName = "edge-stack"
-    }
-
-    telepresence quit > $null
-    telepresence helm upgrade --team-mode > $null
+    $svcName = "edge-stack"
+    telepresence quit 2>&1 | Out-Null
+    telepresence helm upgrade --team-mode 2>&1 | Out-Null
     telepresence login --apikey="$Env:AMBASSADOR_API_KEY"  2>&1 | Out-Null
-    telepresence quit -s > $null
-    telepresence connect --docker > $null
+    telepresence quit -s 2>&1 | Out-Null
+    telepresence connect --docker 2>&1 | Out-Null
 
     $interceptName = (kubectl get rs -n emojivoto --selector=app=web-app --no-headers -o custom-columns=":metadata.name")
     telepresence intercept "$interceptName" --docker --context default -n "$Global:EMOJIVOTO_NS" --service web-app --port 8083:80 --ingress-port 80 --ingress-host "$svcName.ambassador" --ingress-l5 "$svcName.ambassador"
