@@ -1,4 +1,4 @@
-param([string]$action="TP_SCIPT")
+param([string]$action="TP_SCRIPT")
 
 $Global:USE_TELEMETRY=$true
 $Global:ACTION=$action
@@ -81,8 +81,6 @@ function check_init_config{
     display_step(2)
     Write-Host "Checking for AMBASSADOR_API_KEY environment variable"
     if(-not ($Env:AMBASSADOR_API_KEY)){
-        # you will need to set the AMBASSADOR_API_KEY via the command line
-        # New-Item -Path Env:\AMBASSADOR_API_KEY -Value 'NTIyOWExZDktYTc5...'
         Write-Host 'AMBASSADOR_API_KEY is not currently defined. Please set the environment variable in the shell e.g.'
         Write-Host 'New-Item -Path Env:\AMBASSADOR_API_KEY -Value NTIyOWExZDktYTc5...'
         Write-Host 'You can get an AMBASSADOR_API_KEY and free remote demo cluster by taking the tour of Ambassador Cloud at https://app.getambassador.io/cloud/welcome?tour=intermediate '
@@ -101,7 +99,7 @@ function run_dev_container{
     if ($CONTAINER_ID) {
         docker kill $CONTAINER_ID >$null
     }
-    docker run -d --name ambassador-demo --pull always --network=container:tp-default --rm -it -v ${PWD}:/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour
+    docker run -d --name ambassador-demo --pull always --network=container:tp-default --rm -it -v ${PWD}:/opt/emojivoto/emojivoto-web-app/js datawire/intermediate-tour:20230515.154709
     $CONTAINER_ID=$(docker ps --filter 'name=ambassador-demo' --format '{{.ID}}')
     send_telemetry("devContainerStarted")
 }
@@ -147,7 +145,7 @@ function install_upgrade_telepresence{
         }
     }
     if ($install_telepresence) {
-        $telepresence_download_url = "https://app.getambassador.io/download/tel2/windows/amd64/latest/telepresence-setup.exe"
+        $telepresence_download_url = "https://app.getambassador.io/download/tel2/windows/amd64/2.13.3/telepresence-setup.exe"
         Invoke-WebRequest $telepresence_download_url -OutFile telepresence-setup.exe
         Start-Process .\telepresence-setup.exe -NoNewWindow -Wait
         Remove-Item telepresence-setup.exe -Recurse -Confirm:$false -Force
@@ -198,8 +196,8 @@ function display_instructions_to_user () {
 }
 
 use_telemetry
-has_cli
 set_os_arch
+has_cli
 check_init_config
 install_upgrade_telepresence
 connect_to_k8s
