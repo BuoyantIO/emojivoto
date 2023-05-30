@@ -58,7 +58,7 @@ function has_cli {
         $meet_requirements=$false
     }
     if (-not (docker stats --no-stream 2> $null)) {
-        Write-Host "El demonio de Docker no está ejecutándose"
+        Write-Host "The Docker daemon isn't running"
         $meet_requirements=$false
     }
     if(-not $meet_requirements){
@@ -74,7 +74,6 @@ function set_os_arch{
         Write-Host "Unsupported architecture $Env:PROCESSOR_ARCHITECTURE"
         exit 
     }
-    
 }
 
 function check_init_config{
@@ -192,7 +191,7 @@ function display_instructions_to_user () {
     Write-Host 'INSTRUCTIONS FOR DEVELOPMENT'
     Write-Host '============================'
     Write-Host 'To set the correct Kubernetes context on this shell, please execute:'
-    Write-Host 'export KUBECONFIG=./emojivoto_k8s_context.yaml'
+    Write-Host 'New-Item -Path Env:\KUBECONFIG -Value=./emojivoto_k8s_context.yaml'
 }
 
 use_telemetry
