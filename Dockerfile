@@ -1,4 +1,6 @@
-FROM ripta/emojivoto-base:v13 AS build
+ARG PROJECT_ID
+
+FROM gcr.io/$PROJECT_ID/emojivoto-base:v13 AS build
 WORKDIR /app
 COPY . .
 RUN apt update && apt install -y unzip protoc-gen-go protoc-gen-go-grpc
