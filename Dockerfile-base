@@ -1,4 +1,7 @@
-FROM debian:bullseye
+FROM golang:1.23-bookworm AS go-base
+
+
+FROM node:18-bookworm AS node-base
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -8,3 +11,13 @@ RUN apt-get update \
         jq \
         nghttp2 \
     && rm -rf /var/lib/apt/lists/*
+
+ENV GOTOOLCHAIN=local
+ENV GOPATH=/go
+ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+COPY --from=go-base /usr/local/go /usr/local/go
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
+
+WORKDIR /app
+
+ENTRYPOINT ["/bin/bash"]

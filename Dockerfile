@@ -1,9 +1,15 @@
-FROM buoyantio/emojivoto-svc-base:v12
+ARG PROJECT_ID
 
-ARG svc_name
+FROM gcr.io/$PROJECT_ID/emojivoto-base:v13 AS build
+WORKDIR /app
+COPY . .
+RUN apt update && apt install -y unzip protoc-gen-go protoc-gen-go-grpc
+RUN make build
+RUN mkdir -p /target/usr/bin \
+    && cp -p ./emojivoto-emoji-svc/target/emojivoto-emoji-svc /target/usr/bin/ \
+    && cp -p ./emojivoto-voting-svc/target/emojivoto-voting-svc /target/usr/bin/ \
+    && cp -p ./emojivoto-web/target/emojivoto-vote-bot /target/usr/bin/ \
+    && cp -p ./emojivoto-web/target/emojivoto-web /target/usr/bin/
 
-COPY $svc_name/target/ /usr/local/bin/
-
-# ARG variables arent available for ENTRYPOINT
-ENV SVC_NAME $svc_name
-ENTRYPOINT cd /usr/local/bin && $SVC_NAME
+FROM debian:bookworm
+COPY --from=build /target/ /

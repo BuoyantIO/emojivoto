@@ -5,7 +5,10 @@ include ./common.mk
 all: build integration-tests
 
 build-base-docker-image:
-	docker build . -f Dockerfile-base -t "buoyantio/emojivoto-svc-base:$(IMAGE_TAG)"
+	docker build . -f Dockerfile-base -t "ripta/emojivoto-base:$(IMAGE_TAG)" --progress plain
+
+build-docker-image: build-base-docker-image
+	docker build . -t "ripta/emojivoto:$(IMAGE_TAG)" --progress plain
 
 web:
 	$(MAKE) -C emojivoto-web

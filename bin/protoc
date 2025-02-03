@@ -10,6 +10,9 @@ if [ "$(uname -s)" = Darwin ]; then
   fi
 else
   os=linux
+  if [ "$arch" = aarch64 ]; then
+    arch=aarch_64
+  fi
 fi
 
 bindir=$( cd "${0%/*}" && pwd )
@@ -32,7 +35,7 @@ if [ ! -f "$protocbin" ]; then
   mkdir -p "$targetbin"
   (
     cd "$tmp"
-    curl -L --silent --fail -o "./protoc.zip" "$protocurl"
+    curl -fSsL -o "./protoc.zip" "$protocurl"
     unzip -q "./protoc.zip" bin/protoc
     chmod +x bin/protoc
   )
