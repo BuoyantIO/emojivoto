@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import 'whatwg-fetch';
 import { Link } from 'react-router-dom';
 
@@ -26,7 +25,7 @@ export default class Leaderboard extends React.Component {
   }
 
   renderLeaderboard() {
-    return _.map(this.state.leaderboard, (emoji, i) => {
+    return this.state.leaderboard.map((emoji, i) => {
       return (
         <div className="emoji" key={`emoji-${i}`} title={`${emoji.votes} votes`}>
           <div>{emoji.unicode}</div>

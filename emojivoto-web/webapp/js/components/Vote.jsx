@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import 'whatwg-fetch';
 
@@ -63,7 +62,7 @@ export default class Vote extends React.Component {
   }
 
   renderEmojiList(emojis) {
-    return _.map(emojis, (emoji, i) => {
+    return emojis.map((emoji, i) => {
       return (
         <div
           className="emoji emoji-votable"
@@ -112,7 +111,7 @@ export default class Vote extends React.Component {
           <h1>EMOJI VOTE</h1>
           <p>Tap to vote for your favorite emoji below</p>
           {this.renderLeaderboardLink()}
-          {!_.isEmpty(emojiList) ? null : <div>Loading emoji...</div>}
+          {emojiList.length !== 0 ? null : <div>Loading emoji...</div>}
 
           <div className="emoji-list">
             {this.renderEmojiList(emojiList)}
