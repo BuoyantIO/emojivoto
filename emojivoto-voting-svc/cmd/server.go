@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -14,18 +15,22 @@ import (
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/api"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
 
-	"contrib.go.opencensus.io/exporter/ocagent"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 )
 
 var (
 	grpcPort                   = os.Getenv("GRPC_PORT")
 	promPort                   = os.Getenv("PROM_PORT")
-	ocagentHost                = os.Getenv("OC_AGENT_HOST")
+	ocagentHost                = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	failureRateVar             = os.Getenv("FAILURE_RATE")
 	failureRateFloat           = float64(0.0)
 	artificialDelayVar         = os.Getenv("ARTIFICIAL_DELAY")
@@ -38,15 +43,29 @@ func main() {
 		log.Fatalf("GRPC_PORT (currently [%s]) environment variable must me set to run the server.", grpcPort)
 	}
 
-	oce, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithReconnectionPeriod(5*time.Second),
-		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("voting"))
+	ctx := context.Background()
+	ote, err := otlptracegrpc.New(
+		ctx,
+		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithReconnectionPeriod(5*time.Second),
+		otlptracegrpc.WithEndpoint(ocagentHost),
+	)
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		log.Fatalf("Failed to create oteltracegrpc-exporter: %v", err)
 	}
-	trace.RegisterExporter(oce)
+
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceName("voting"),
+		),
+	)
+	traceProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithBatcher(ote),
+		sdktrace.WithResource(r))
+	otel.SetTracerProvider(traceProvider)
 
 	poll := voting.NewPoll()
 
@@ -71,7 +90,7 @@ func main() {
 	go func() {
 		grpc_prometheus.EnableHandlingTimeHistogram()
 		grpcServer := grpc.NewServer(
-			grpc.StatsHandler(&ocgrpc.ServerHandler{}),
+			grpc.StatsHandler(otelgrpc.NewServerHandler()),
 			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
 		)

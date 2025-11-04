@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,9 +13,12 @@ import (
 	"strconv"
 	"time"
 
-	"contrib.go.opencensus.io/exporter/ocagent"
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 )
 
 // VoteBot votes for emoji! :ballot_box_with_check:
@@ -25,9 +29,9 @@ import (
 // pick a favorite, so it picks one at random. C'mon VoteBot, try harder!
 
 var (
-	client = &http.Client{Transport: &ochttp.Transport{}}
+	client = &http.Client{Transport: &otelhttp.Transport{}}
 
-	ocagentHost = os.Getenv("OC_AGENT_HOST")
+	ocagentHost = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 )
 
 type emoji struct {
@@ -58,16 +62,29 @@ func main() {
 		requestRate = 1
 	}
 
-	oce, err := ocagent.NewExporter(
-		ocagent.WithInsecure(),
-		ocagent.WithReconnectionPeriod(5*time.Second),
-		ocagent.WithAddress(ocagentHost),
-		ocagent.WithServiceName("vote-bot"))
+	ctx := context.Background()
+	ote, err := otlptracegrpc.New(
+		ctx,
+		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithReconnectionPeriod(5*time.Second),
+		otlptracegrpc.WithEndpoint(ocagentHost),
+	)
 	if err != nil {
-		log.Fatalf("Failed to create ocagent-exporter: %v", err)
+		log.Fatalf("Failed to create oteltracegrpc-exporter: %v", err)
 	}
-	trace.RegisterExporter(oce)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceName("vote-bot"),
+		),
+	)
+	traceProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithBatcher(ote),
+		sdktrace.WithResource(r))
+	otel.SetTracerProvider(traceProvider)
 
 	webURL := "http://" + webHost
 	if _, err := url.Parse(webURL); err != nil {
