@@ -29,7 +29,7 @@ import (
 // pick a favorite, so it picks one at random. C'mon VoteBot, try harder!
 
 var (
-	client = &http.Client{Transport: &otelhttp.Transport{}}
+	client *http.Client
 
 	ocagentHost = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 )
@@ -50,7 +50,7 @@ func main() {
 
 	// setting the the TTL is optional, thus invalid numbers are simply ignored
 	timeToLive, _ := strconv.Atoi(os.Getenv("TTL"))
-	var deadline time.Time = time.Unix(0, 0)
+	var deadline time.Time // zero value of time.Time
 
 	if timeToLive != 0 {
 		deadline = time.Now().Add(time.Second * time.Duration(timeToLive))
@@ -85,6 +85,11 @@ func main() {
 		sdktrace.WithBatcher(ote),
 		sdktrace.WithResource(r))
 	otel.SetTracerProvider(traceProvider)
+
+	// Initialize HTTP client after trace provider is set up
+	client = &http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
 
 	webURL := "http://" + webHost
 	if _, err := url.Parse(webURL); err != nil {
