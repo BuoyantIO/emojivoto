@@ -14,6 +14,7 @@ import (
 
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/api"
 	"github.com/buoyantio/emojivoto/emojivoto-voting-svc/voting"
+	"go.opentelemetry.io/otel/propagation"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -61,6 +62,11 @@ func main() {
 			semconv.ServiceName("voting"),
 		),
 	)
+	propagator := propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+	)
+	otel.SetTextMapPropagator(propagator)
 	traceProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithBatcher(ote),

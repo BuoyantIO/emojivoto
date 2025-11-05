@@ -379,7 +379,7 @@ func writeError(err error, w http.ResponseWriter, r *http.Request, status int) {
 }
 
 func handle(path string, h func(w http.ResponseWriter, r *http.Request)) {
-	http.Handle(path, otelhttp.NewHandler(http.HandlerFunc(h), path))
+	http.Handle(path, otelhttp.WithRouteTag(path, http.HandlerFunc(h)))
 }
 
 func StartServer(webPort, webpackDevServer, indexBundle string, emojiServiceClient pb.EmojiServiceClient, votingClient pb.VotingServiceClient) {
